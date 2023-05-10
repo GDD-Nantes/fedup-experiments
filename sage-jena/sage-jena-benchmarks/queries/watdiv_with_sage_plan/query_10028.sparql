@@ -1,0 +1,4 @@
+SELECT ?v2 ?v0 WHERE {
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/subscribes> <http://db.uwaterloo.ca/~galuc/wsdbm/Website33>.
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/userId> ?v2.
+}

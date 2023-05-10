@@ -1,0 +1,4 @@
+SELECT ?v1 ?v0 WHERE {
+	?v0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://db.uwaterloo.ca/~galuc/wsdbm/ProductCategory14>.
+	?v0 <http://ogp.me/ns#tag> ?v1.
+}

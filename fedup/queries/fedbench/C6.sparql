@@ -1,0 +1,12 @@
+SELECT ?actor ?filmTitle ?news ?variants ?articleCount ?first_use ?latest_use WHERE {
+    ?film <http://purl.org/dc/terms/title> ?filmTitle .
+    ?film <http://data.linkedmdb.org/resource/movie/actor> ?actor .
+    ?actor <http://www.w3.org/2002/07/owl#sameAs> ?dbpediaURI .
+    ?nytURI <http://www.w3.org/2002/07/owl#sameAs> ?dbpediaURI .
+    ?nytURI <http://data.nytimes.com/elements/topicPage> ?news .
+    ?nytURI <http://data.nytimes.com/elements/number_of_variants> ?variants .
+    ?nytURI <http://data.nytimes.com/elements/associated_article_count> ?articleCount .
+    ?nytURI <http://data.nytimes.com/elements/first_use> ?first_use .
+    ?nytURI <http://data.nytimes.com/elements/latest_use> ?latest_use .
+}
+ORDER BY (?actor)

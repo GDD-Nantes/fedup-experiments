@@ -1,0 +1,7 @@
+SELECT ?v1 ?v3 ?v2 ?v4 ?v0 WHERE {
+	?v2 <http://www.geonames.org/ontology#parentCountry> ?v3.
+	?v0 <http://schema.org/nationality> ?v3.
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/gender> <http://db.uwaterloo.ca/~galuc/wsdbm/Gender0>.
+	?v0 <http://xmlns.com/foaf/givenName> ?v1.
+	?v4 <http://schema.org/eligibleRegion> ?v3.
+}

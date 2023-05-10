@@ -1,0 +1,8 @@
+SELECT ?v1 ?v5 ?v2 ?v4 ?v0 WHERE {
+	?v0 <http://schema.org/contentSize> ?v4.
+	?v0 <http://schema.org/author> ?v2.
+	?v2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://db.uwaterloo.ca/~galuc/wsdbm/Role2>.
+	?v2 <http://schema.org/email> ?v5.
+	?v0 <http://ogp.me/ns#tag> ?v1.
+	?v2 <http://db.uwaterloo.ca/~galuc/wsdbm/friendOf> ?v2.
+}

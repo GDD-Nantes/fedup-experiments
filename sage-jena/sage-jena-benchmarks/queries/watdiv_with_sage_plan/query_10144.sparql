@@ -1,0 +1,5 @@
+SELECT ?v0 ?v2 ?v1 WHERE {
+	?v1 <http://schema.org/language> <http://db.uwaterloo.ca/~galuc/wsdbm/Language34>.
+	?v1 <http://ogp.me/ns#title> ?v2.
+	?v0 <http://purl.org/goodrelations/includes> ?v1.
+}

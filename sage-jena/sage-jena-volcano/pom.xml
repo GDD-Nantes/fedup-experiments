@@ -1,0 +1,77 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.gdd.sage</groupId>
+  <artifactId>sage-jena-volcano</artifactId>
+  <name>sage-jena-volcano</name>
+  <packaging>jar</packaging>
+
+  <parent>
+    <groupId>fr.gdd.sage</groupId>
+    <artifactId>sage-jena</artifactId>
+    <version>0.0.1</version>
+  </parent>
+
+
+  <dependencies>
+    <dependency> <!-- makes use of already implem'd for compilation targeting jena -->
+      <groupId>fr.gdd.sage</groupId>
+      <artifactId>sage-jena-tdb2</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.jena</groupId>
+      <artifactId>apache-jena-libs</artifactId>
+      <type>pom</type>
+    </dependency>    
+    <dependency> <!-- logger of jena -->
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <!-- mvn dependency:build-classpath -Dmdep.outputFile=cp.txt -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.9</version>
+        <executions>
+          <execution>
+            <id>build-classpath</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>build-classpath</goal>
+            </goals>
+            <configuration>
+              <!-- configure the plugin here -->
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+
+      <plugin> <!-- so junit 5 tests are properly run on github -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+
+
+    </plugins>
+  </build>
+  
+</project>

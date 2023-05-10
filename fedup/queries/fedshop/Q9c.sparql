@@ -1,0 +1,5 @@
+PREFIX rev: <http://purl.org/stuff/rev#>
+
+SELECT DISTINCT ?x WHERE { 
+    <http://www.ratingsite3.fr/Review1276> rev:reviewer ?x 
+}

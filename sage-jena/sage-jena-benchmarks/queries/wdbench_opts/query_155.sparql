@@ -1,0 +1,4 @@
+SELECT * WHERE {
+?x1 <http://www.wikidata.org/prop/direct/P17> <http://www.wikidata.org/entity/Q183> . ?x1 <http://www.wikidata.org/prop/direct/P31> <http://www.wikidata.org/entity/Q515> . ?x1 <http://www.wikidata.org/prop/direct/P473> ?x2 . <http://www.wikidata.org/entity/Q159> <http://www.wikidata.org/prop/direct/P474> ?x3 . OPTIONAL { ?x1 <http://www.wikidata.org/prop/direct/P402> ?x4 . } 
+
+}

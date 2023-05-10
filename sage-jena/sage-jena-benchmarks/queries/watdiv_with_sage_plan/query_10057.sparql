@@ -1,0 +1,10 @@
+SELECT ?v7 ?v1 ?v5 ?v0 ?v4 ?v2 ?v3 ?v8 WHERE {
+	?v1 <http://schema.org/expires> ?v7.
+	?v1 <http://schema.org/editor> ?v5.
+	?v5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://db.uwaterloo.ca/~galuc/wsdbm/Role2>.
+	?v1 <http://ogp.me/ns#title> ?v4.
+	?v5 <http://db.uwaterloo.ca/~galuc/wsdbm/gender> ?v8.
+	?v0 <http://purl.org/goodrelations/includes> ?v1.
+	?v0 <http://purl.org/goodrelations/validFrom> ?v3.
+	?v0 <http://purl.org/goodrelations/serialNumber> ?v2.
+}

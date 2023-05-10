@@ -1,0 +1,6 @@
+SELECT ?v3 ?v4 ?v1 ?v0 WHERE {
+	<http://db.uwaterloo.ca/~galuc/wsdbm/Retailer857> <http://purl.org/goodrelations/offers> ?v0.
+	?v0 <http://purl.org/goodrelations/validThrough> ?v3.
+	?v0 <http://purl.org/goodrelations/includes> ?v1.
+	?v1 <http://schema.org/printPage> ?v4.
+}

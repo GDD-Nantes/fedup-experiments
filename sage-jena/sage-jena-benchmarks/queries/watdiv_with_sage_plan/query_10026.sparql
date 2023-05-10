@@ -1,0 +1,7 @@
+SELECT ?v5 ?v0 ?v4 ?v1 ?v2 WHERE {
+	?v0 <http://schema.org/nationality> <http://db.uwaterloo.ca/~galuc/wsdbm/Country7>.
+	?v0 <http://schema.org/birthDate> ?v2.
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/gender> ?v4.
+	?v0 <http://xmlns.com/foaf/familyName> ?v1.
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/likes> ?v5.
+}

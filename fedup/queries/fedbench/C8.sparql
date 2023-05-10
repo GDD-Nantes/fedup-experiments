@@ -1,0 +1,15 @@
+SELECT DISTINCT * WHERE {
+    ?paper <http://data.semanticweb.org/ns/swc/ontology#isPartOf> <http://data.semanticweb.org/conference/iswc/2009/proceedings> .
+    <http://data.semanticweb.org/conference/iswc/2009/proceedings> <http://swrc.ontoware.org/ontology#address> ?proceedingAddress .
+    ?paper <http://swrc.ontoware.org/ontology#author> ?author .
+    ?author <http://swrc.ontoware.org/ontology#affiliation> ?affiliation .
+    ?author <http://www.w3.org/2000/01/rdf-schema#label> ?fullnames .
+    ?author <http://xmlns.com/foaf/0.1/based_near> ?place .
+    OPTIONAL {
+        ?place <http://dbpedia.org/ontology/capital> ?capital .
+        ?place <http://dbpedia.org/ontology/populationDensity> ?populationDensity .
+        ?place <http://dbpedia.org/ontology/governmentType> ?governmentType .
+        ?place <http://dbpedia.org/ontology/language> ?language .
+        ?place <http://dbpedia.org/ontology/leaderTitle> ?leaderTitle .
+    }
+}

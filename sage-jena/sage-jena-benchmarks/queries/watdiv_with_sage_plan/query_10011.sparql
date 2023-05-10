@@ -1,0 +1,13 @@
+SELECT ?v6 ?v5 ?v8 ?v0 ?v3 ?v7 ?v11 ?v4 ?v10 ?v1 ?v2 WHERE {
+	?v0 <http://schema.org/contactPoint> ?v8.
+	?v0 <http://schema.org/openingHours> ?v11.
+	?v0 <http://purl.org/goodrelations/name> ?v1.
+	?v0 <http://schema.org/email> ?v10.
+	?v0 <http://purl.org/goodrelations/offers> ?v2.
+	?v2 <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country19>.
+	?v2 <http://purl.org/goodrelations/validFrom> ?v4.
+	?v2 <http://purl.org/goodrelations/validThrough> ?v5.
+	?v6 <http://purl.org/stuff/rev#reviewer> ?v8.
+	?v6 <http://purl.org/stuff/rev#rating> ?v7.
+	?v2 <http://purl.org/goodrelations/price> ?v3.
+}

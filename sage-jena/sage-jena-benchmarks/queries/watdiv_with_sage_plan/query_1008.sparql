@@ -1,0 +1,10 @@
+SELECT ?v5 ?v0 ?v4 ?v3 ?v6 ?v2 ?v8 ?v7 WHERE {
+	?v0 <http://ogp.me/ns#tag> <http://db.uwaterloo.ca/~galuc/wsdbm/Topic122>.
+	?v0 <http://schema.org/keywords> ?v8.
+	?v0 <http://schema.org/contentRating> ?v6.
+	?v0 <http://schema.org/description> ?v7.
+	?v0 <http://purl.org/stuff/rev#hasReview> ?v2.
+	?v2 <http://purl.org/stuff/rev#totalVotes> ?v5.
+	?v2 <http://purl.org/stuff/rev#rating> ?v3.
+	?v2 <http://purl.org/stuff/rev#reviewer> ?v4.
+}

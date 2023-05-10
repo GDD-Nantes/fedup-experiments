@@ -1,0 +1,12 @@
+SELECT ?v9 ?v6 ?v5 ?v8 ?v3 ?v7 ?v4 ?v10 ?v1 ?v2 WHERE {
+	<http://db.uwaterloo.ca/~galuc/wsdbm/City212> <http://www.geonames.org/ontology#parentCountry> ?v1.
+	?v9 <http://schema.org/nationality> ?v1.
+	?v4 <http://schema.org/eligibleRegion> ?v1.
+	?v4 <http://schema.org/priceValidUntil> ?v10.
+	?v4 <http://purl.org/goodrelations/serialNumber> ?v5.
+	?v4 <http://schema.org/eligibleQuantity> ?v7.
+	?v2 <http://purl.org/goodrelations/offers> ?v4.
+	?v2 <http://schema.org/legalName> ?v8.
+	?v2 <http://schema.org/aggregateRating> ?v6.
+	?v2 <http://purl.org/goodrelations/description> ?v3.
+}

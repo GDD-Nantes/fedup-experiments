@@ -1,0 +1,5 @@
+SELECT ?v3 ?v1 ?v0 WHERE {
+	?v1 <http://www.geonames.org/ontology#parentCountry> <http://db.uwaterloo.ca/~galuc/wsdbm/Country23>.
+	?v0 <http://purl.org/dc/terms/Location> ?v1.
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/gender> ?v3.
+}

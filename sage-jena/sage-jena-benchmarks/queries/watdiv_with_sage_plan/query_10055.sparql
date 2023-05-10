@@ -1,0 +1,6 @@
+SELECT ?v2 ?v1 ?v3 ?v0 WHERE {
+	?v1 <http://db.uwaterloo.ca/~galuc/wsdbm/hasGenre> <http://db.uwaterloo.ca/~galuc/wsdbm/SubGenre135>.
+	?v1 <http://schema.org/contentSize> ?v2.
+	?v1 <http://schema.org/description> ?v3.
+	?v0 <http://purl.org/goodrelations/includes> ?v1.
+}

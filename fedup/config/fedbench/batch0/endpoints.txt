@@ -1,0 +1,13 @@
+http://localhost:8890/sparql?default-graph-uri=http://example.com/dbpedia
+http://localhost:8890/sparql?default-graph-uri=http://example.com/nyt
+http://localhost:8890/sparql?default-graph-uri=http://example.com/drugbank
+http://localhost:8890/sparql?default-graph-uri=http://example.com/geonames
+http://localhost:8890/sparql?default-graph-uri=http://example.com/kegg
+http://localhost:8890/sparql?default-graph-uri=http://example.com/chebi
+http://localhost:8890/sparql?default-graph-uri=http://example.com/swdf
+http://localhost:8890/sparql?default-graph-uri=http://example.com/lmdb
+http://localhost:8890/sparql?default-graph-uri=http://example.com/affymetrix
+http://localhost:8890/sparql?default-graph-uri=http://example.com/jamendo
+http://localhost:8890/sparql?default-graph-uri=http://example.com/LinkedTCGA-A
+http://localhost:8890/sparql?default-graph-uri=http://example.com/LinkedTCGA-E
+http://localhost:8890/sparql?default-graph-uri=http://example.com/LinkedTCGA-M

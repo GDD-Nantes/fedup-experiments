@@ -1,0 +1,19 @@
+name: fedupxp
+
+channels:
+  - default
+  - conda-forge
+
+dependencies:
+  - python
+  - seaborn
+  - altair
+  - numpy
+  - matplotlib
+  - notebook
+  - pandas
+  - setuptools
+  - requests
+  - pip
+  - pip:
+    - snakemake

@@ -1,0 +1,10 @@
+SELECT ?v6 ?v5 ?v8 ?v3 ?v0 ?v7 ?v4 ?v2 WHERE {
+	?v0 <http://xmlns.com/foaf/age> <http://db.uwaterloo.ca/~galuc/wsdbm/AgeGroup2>.
+	?v0 <http://schema.org/nationality> ?v8.
+	?v2 <http://schema.org/eligibleRegion> ?v8.
+	?v2 <http://purl.org/goodrelations/validFrom> ?v5.
+	?v2 <http://purl.org/goodrelations/validThrough> ?v6.
+	?v2 <http://purl.org/goodrelations/includes> ?v3.
+	?v2 <http://schema.org/eligibleQuantity> ?v7.
+	?v2 <http://purl.org/goodrelations/price> ?v4.
+}

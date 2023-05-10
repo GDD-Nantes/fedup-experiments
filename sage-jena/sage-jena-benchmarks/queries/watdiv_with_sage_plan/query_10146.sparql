@@ -1,0 +1,12 @@
+SELECT ?v9 ?v6 ?v5 ?v8 ?v0 ?v3 ?v4 ?v10 ?v1 ?v2 WHERE {
+	?v0 <http://schema.org/faxNumber> ?v8.
+	?v0 <http://schema.org/aggregateRating> ?v5.
+	?v0 <http://purl.org/goodrelations/description> ?v1.
+	?v0 <http://schema.org/telephone> ?v10.
+	?v0 <http://purl.org/goodrelations/offers> ?v2.
+	?v2 <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country14>.
+	?v2 <http://schema.org/priceValidUntil> ?v9.
+	?v2 <http://purl.org/goodrelations/validThrough> ?v4.
+	?v2 <http://purl.org/goodrelations/includes> ?v3.
+	?v2 <http://schema.org/eligibleQuantity> ?v6.
+}

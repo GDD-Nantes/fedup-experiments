@@ -1,0 +1,10 @@
+SELECT ?v7 ?v1 ?v5 ?v2 ?v4 ?v6 ?v3 ?v8 WHERE {
+	<http://db.uwaterloo.ca/~galuc/wsdbm/User90945> <http://purl.org/dc/terms/Location> ?v1.
+	?v1 <http://www.geonames.org/ontology#parentCountry> ?v2.
+	?v3 <http://schema.org/eligibleRegion> ?v2.
+	?v3 <http://purl.org/goodrelations/validFrom> ?v6.
+	?v3 <http://purl.org/goodrelations/validThrough> ?v7.
+	?v3 <http://purl.org/goodrelations/serialNumber> ?v5.
+	?v3 <http://schema.org/eligibleQuantity> ?v8.
+	?v3 <http://purl.org/goodrelations/price> ?v4.
+}

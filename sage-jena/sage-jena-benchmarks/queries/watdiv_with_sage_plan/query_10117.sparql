@@ -1,0 +1,6 @@
+SELECT ?v3 ?v2 ?v1 ?v0 WHERE {
+	?v2 <http://purl.org/stuff/rev#hasReview> <http://db.uwaterloo.ca/~galuc/wsdbm/Review85552>.
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/likes> ?v2.
+	?v0 <http://xmlns.com/foaf/age> ?v1.
+	?v2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?v3.
+}

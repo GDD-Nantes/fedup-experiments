@@ -1,0 +1,14 @@
+SELECT ?v12 ?v7 ?v1 ?v5 ?v9 ?v0 ?v10 ?v4 ?v11 ?v2 ?v6 ?v8 WHERE {
+	?v0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://db.uwaterloo.ca/~galuc/wsdbm/ProductCategory5>.
+	?v0 <http://schema.org/contentSize> ?v9.
+	?v0 <http://schema.org/keywords> ?v11.
+	?v0 <http://schema.org/description> ?v10.
+	?v0 <http://ogp.me/ns#tag> ?v1.
+	?v2 <http://ogp.me/ns#tag> ?v1.
+	?v0 <http://purl.org/stuff/rev#hasReview> ?v4.
+	?v4 <http://purl.org/stuff/rev#title> ?v8.
+	?v4 <http://purl.org/stuff/rev#text> ?v7.
+	?v12 <http://db.uwaterloo.ca/~galuc/wsdbm/purchaseFor> ?v0.
+	?v4 <http://purl.org/stuff/rev#rating> ?v5.
+	?v4 <http://purl.org/stuff/rev#reviewer> ?v6.
+}

@@ -1,0 +1,9 @@
+SELECT ?v6 ?v5 ?v7 ?v1 ?v4 ?v3 ?v0 WHERE {
+	?v0 <http://ogp.me/ns#tag> <http://db.uwaterloo.ca/~galuc/wsdbm/Topic178>.
+	?v0 <http://schema.org/expires> ?v4.
+	?v0 <http://xmlns.com/foaf/homepage> ?v1.
+	?v0 <http://ogp.me/ns#title> ?v3.
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/hasGenre> ?v5.
+	?v6 <http://db.uwaterloo.ca/~galuc/wsdbm/likes> ?v0.
+	?v7 <http://db.uwaterloo.ca/~galuc/wsdbm/purchaseFor> ?v0.
+}

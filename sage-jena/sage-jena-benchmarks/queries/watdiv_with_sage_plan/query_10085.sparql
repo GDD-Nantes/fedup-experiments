@@ -1,0 +1,7 @@
+SELECT ?v2 ?v1 ?v4 ?v0 WHERE {
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/gender> <http://db.uwaterloo.ca/~galuc/wsdbm/Gender1>.
+	?v0 <http://xmlns.com/foaf/age> ?v1.
+	?v0 <http://xmlns.com/foaf/familyName> ?v2.
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/subscribes> ?v4.
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/follows> ?v0.
+}

@@ -1,0 +1,14 @@
+SELECT ?v7 ?v12 ?v1 ?v5 ?v11 ?v0 ?v10 ?v2 ?v4 ?v6 ?v3 ?v8 WHERE {
+	?v0 <http://schema.org/eligibleRegion> <http://db.uwaterloo.ca/~galuc/wsdbm/Country9>.
+	?v0 <http://schema.org/priceValidUntil> ?v11.
+	?v0 <http://purl.org/goodrelations/validFrom> ?v5.
+	?v0 <http://purl.org/goodrelations/validThrough> ?v6.
+	?v0 <http://purl.org/goodrelations/includes> ?v1.
+	?v1 <http://schema.org/keywords> ?v10.
+	?v0 <http://purl.org/goodrelations/serialNumber> ?v4.
+	?v0 <http://schema.org/eligibleQuantity> ?v8.
+	?v2 <http://purl.org/goodrelations/offers> ?v0.
+	?v1 <http://ogp.me/ns#tag> ?v7.
+	?v12 <http://db.uwaterloo.ca/~galuc/wsdbm/purchaseFor> ?v1.
+	?v0 <http://purl.org/goodrelations/price> ?v3.
+}

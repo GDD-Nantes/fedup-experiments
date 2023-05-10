@@ -1,0 +1,5 @@
+SELECT ?v2 ?v1 ?v0 WHERE {
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/hasGenre> <http://db.uwaterloo.ca/~galuc/wsdbm/SubGenre110>.
+	?v0 <http://schema.org/contentRating> ?v2.
+	?v0 <http://ogp.me/ns#title> ?v1.
+}

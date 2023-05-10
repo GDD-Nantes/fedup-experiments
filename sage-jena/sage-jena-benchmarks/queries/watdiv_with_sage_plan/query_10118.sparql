@@ -1,0 +1,7 @@
+SELECT ?v5 ?v4 ?v2 ?v3 ?v0 WHERE {
+	?v0 <http://ogp.me/ns#tag> <http://db.uwaterloo.ca/~galuc/wsdbm/Topic97>.
+	?v0 <http://schema.org/expires> ?v3.
+	?v0 <http://schema.org/caption> ?v2.
+	?v4 <http://db.uwaterloo.ca/~galuc/wsdbm/purchaseFor> ?v0.
+	?v4 <http://db.uwaterloo.ca/~galuc/wsdbm/purchaseDate> ?v5.
+}

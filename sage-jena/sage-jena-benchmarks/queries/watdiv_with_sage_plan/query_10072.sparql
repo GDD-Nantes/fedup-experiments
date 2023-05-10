@@ -1,0 +1,10 @@
+SELECT ?v7 ?v1 ?v5 ?v8 ?v6 ?v0 ?v3 ?v2 WHERE {
+	?v3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://db.uwaterloo.ca/~galuc/wsdbm/Genre18>.
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/hasGenre> ?v3.
+	?v0 <http://schema.org/caption> ?v5.
+	?v0 <http://schema.org/text> ?v7.
+	?v0 <http://schema.org/contentRating> ?v6.
+	?v0 <http://xmlns.com/foaf/homepage> ?v1.
+	?v2 <http://purl.org/goodrelations/includes> ?v0.
+	?v8 <http://db.uwaterloo.ca/~galuc/wsdbm/likes> ?v0.
+}

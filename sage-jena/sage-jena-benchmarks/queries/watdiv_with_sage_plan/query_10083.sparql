@@ -1,0 +1,10 @@
+SELECT ?v7 ?v1 ?v0 ?v4 ?v2 ?v6 ?v3 ?v8 WHERE {
+	?v1 <http://schema.org/priceValidUntil> ?v8.
+	?v1 <http://purl.org/goodrelations/validFrom> ?v2.
+	?v1 <http://purl.org/goodrelations/validThrough> ?v3.
+	?v1 <http://schema.org/eligibleQuantity> ?v6.
+	?v0 <http://purl.org/goodrelations/offers> ?v1.
+	?v1 <http://schema.org/eligibleRegion> ?v7.
+	?v4 <http://schema.org/nationality> ?v7.
+	?v4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://db.uwaterloo.ca/~galuc/wsdbm/Role2>.
+}

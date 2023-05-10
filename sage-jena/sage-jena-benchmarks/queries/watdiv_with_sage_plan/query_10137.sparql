@@ -1,0 +1,5 @@
+SELECT ?v3 ?v2 ?v0 WHERE {
+	?v0 <http://purl.org/dc/terms/Location> <http://db.uwaterloo.ca/~galuc/wsdbm/City158>.
+	?v0 <http://xmlns.com/foaf/familyName> ?v2.
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/userId> ?v3.
+}

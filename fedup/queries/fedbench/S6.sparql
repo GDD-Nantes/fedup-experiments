@@ -1,0 +1,6 @@
+SELECT ?name ?location WHERE {
+    ?germany <http://www.geonames.org/ontology#name> 'Federal Republic of Germany' .
+    ?location <http://www.geonames.org/ontology#parentFeature> ?germany .
+    ?artist <http://xmlns.com/foaf/0.1/based_near> ?location .
+    ?artist <http://xmlns.com/foaf/0.1/name> ?name .
+}

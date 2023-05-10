@@ -1,0 +1,5 @@
+SELECT ?v3 ?v2 ?v0 WHERE {
+	?v0 <http://xmlns.com/foaf/age> <http://db.uwaterloo.ca/~galuc/wsdbm/AgeGroup2>.
+	?v0 <http://xmlns.com/foaf/homepage> ?v2.
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/userId> ?v3.
+}

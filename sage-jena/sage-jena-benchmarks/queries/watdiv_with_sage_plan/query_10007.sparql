@@ -1,0 +1,14 @@
+SELECT ?v9 ?v5 ?v8 ?v0 ?v7 ?v3 ?v11 ?v4 ?v10 ?v1 ?v2 WHERE {
+	?v0 <http://schema.org/text> ?v10.
+	?v0 <http://xmlns.com/foaf/homepage> ?v1.
+	?v0 <http://schema.org/description> ?v8.
+	?v0 <http://ogp.me/ns#title> ?v3.
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/hasGenre> ?v11.
+	?v2 <http://purl.org/goodrelations/includes> ?v0.
+	?v0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?v4.
+	?v0 <http://purl.org/stuff/rev#hasReview> ?v7.
+	?v7 <http://purl.org/stuff/rev#reviewer> ?v5.
+	?v5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://db.uwaterloo.ca/~galuc/wsdbm/Role1>.
+	?v2 <http://schema.org/eligibleRegion> ?v9.
+	?v5 <http://db.uwaterloo.ca/~galuc/wsdbm/follows> ?v5.
+}

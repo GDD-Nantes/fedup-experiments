@@ -1,0 +1,3 @@
+SELECT ?v1 WHERE {
+	<http://db.uwaterloo.ca/~galuc/wsdbm/User36871> <http://xmlns.com/foaf/age> ?v1.
+}

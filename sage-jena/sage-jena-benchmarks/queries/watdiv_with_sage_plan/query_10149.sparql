@@ -1,0 +1,6 @@
+SELECT ?v3 ?v2 ?v1 ?v0 WHERE {
+	<http://db.uwaterloo.ca/~galuc/wsdbm/User45957> <http://schema.org/nationality> ?v3.
+	?v0 <http://schema.org/eligibleRegion> ?v3.
+	?v0 <http://purl.org/goodrelations/validThrough> ?v2.
+	?v0 <http://purl.org/goodrelations/serialNumber> ?v1.
+}

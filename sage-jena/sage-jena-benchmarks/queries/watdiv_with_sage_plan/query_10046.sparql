@@ -1,0 +1,9 @@
+SELECT ?v6 ?v5 ?v3 ?v0 ?v7 ?v4 ?v2 WHERE {
+	?v0 <http://xmlns.com/foaf/homepage> <http://db.uwaterloo.ca/~galuc/wsdbm/Website1557>.
+	?v0 <http://schema.org/keywords> ?v4.
+	?v0 <http://schema.org/text> ?v5.
+	?v0 <http://ogp.me/ns#title> ?v3.
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/hasGenre> ?v6.
+	?v2 <http://purl.org/goodrelations/includes> ?v0.
+	?v7 <http://db.uwaterloo.ca/~galuc/wsdbm/purchaseFor> ?v0.
+}

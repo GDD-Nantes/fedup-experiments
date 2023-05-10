@@ -1,0 +1,12 @@
+SELECT ?v2 ?v1 ?v6 ?v3 ?v7 ?v5 ?v8 ?v9 ?v4 WHERE {
+	<http://db.uwaterloo.ca/~galuc/wsdbm/City208> <http://www.geonames.org/ontology#parentCountry> ?v1.
+	?v6 <http://schema.org/nationality> ?v1.
+	?v6 <http://db.uwaterloo.ca/~galuc/wsdbm/likes> ?v3.
+	?v2 <http://purl.org/goodrelations/includes> ?v3.
+	?v2 <http://purl.org/goodrelations/validThrough> ?v5.
+	?v2 <http://purl.org/goodrelations/serialNumber> ?v4.
+	?v2 <http://schema.org/eligibleQuantity> ?v8.
+	?v6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?v7.
+	?v9 <http://db.uwaterloo.ca/~galuc/wsdbm/purchaseFor> ?v3.
+	?v2 <http://schema.org/eligibleRegion> ?v1.
+}

@@ -1,0 +1,9 @@
+SELECT ?v6 ?v5 ?v7 ?v1 ?v4 ?v3 ?v0 WHERE {
+	<http://db.uwaterloo.ca/~galuc/wsdbm/Retailer722> <http://purl.org/goodrelations/offers> ?v0.
+	?v0 <http://schema.org/priceValidUntil> ?v7.
+	?v0 <http://purl.org/goodrelations/includes> ?v1.
+	?v0 <http://purl.org/goodrelations/serialNumber> ?v4.
+	?v0 <http://schema.org/eligibleQuantity> ?v5.
+	?v0 <http://schema.org/eligibleRegion> ?v6.
+	?v0 <http://purl.org/goodrelations/price> ?v3.
+}

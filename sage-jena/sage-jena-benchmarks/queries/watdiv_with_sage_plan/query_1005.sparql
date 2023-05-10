@@ -1,0 +1,7 @@
+SELECT ?v5 ?v0 ?v2 ?v4 ?v3 WHERE {
+	?v0 <http://ogp.me/ns#tag> <http://db.uwaterloo.ca/~galuc/wsdbm/Topic74>.
+	?v0 <http://purl.org/stuff/rev#hasReview> ?v2.
+	?v2 <http://purl.org/stuff/rev#totalVotes> ?v5.
+	?v2 <http://purl.org/stuff/rev#title> ?v4.
+	?v2 <http://purl.org/stuff/rev#text> ?v3.
+}

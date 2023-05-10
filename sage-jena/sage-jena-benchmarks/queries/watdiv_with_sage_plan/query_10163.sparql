@@ -1,0 +1,7 @@
+SELECT ?v1 ?v4 ?v2 ?v3 ?v0 WHERE {
+	<http://db.uwaterloo.ca/~galuc/wsdbm/Purchase73476> <http://db.uwaterloo.ca/~galuc/wsdbm/purchaseFor> ?v0.
+	?v0 <http://schema.org/text> ?v4.
+	?v0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?v3.
+	?v0 <http://ogp.me/ns#tag> ?v1.
+	?v2 <http://ogp.me/ns#tag> ?v1.
+}

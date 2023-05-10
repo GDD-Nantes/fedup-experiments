@@ -1,0 +1,13 @@
+SELECT ?drug ?keggmass ?chebiIupacName WHERE {
+    ?drug <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs> .
+    ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/keggCompoundId> ?keggDrug .
+    ?keggDrug <http://bio2rdf.org/ns/bio2rdf#mass> ?keggmass .
+    ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/genericName> ?drugBankName .
+    ?chebiDrug <http://purl.org/dc/elements/1.1/title> ?drugBankName .
+    ?chebiDrug <http://bio2rdf.org/ns/chebi#iupacName> ?chebiIupacName .
+    OPTIONAL { 
+        ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/inchiIdentifier> ?drugbankInchi .
+        ?chebiDrug <http://bio2rdf.org/ns/bio2rdf#inchi> ?chebiInchi .
+        FILTER (?drugbankInchi = ?chebiInchi) .
+    }
+}

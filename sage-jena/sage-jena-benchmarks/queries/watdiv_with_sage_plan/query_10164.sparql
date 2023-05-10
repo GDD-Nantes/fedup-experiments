@@ -1,0 +1,9 @@
+SELECT ?v5 ?v0 ?v1 ?v3 ?v6 ?v2 ?v7 WHERE {
+	?v0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://db.uwaterloo.ca/~galuc/wsdbm/Genre3>.
+	?v2 <http://db.uwaterloo.ca/~galuc/wsdbm/hasGenre> ?v0.
+	?v2 <http://schema.org/caption> ?v5.
+	?v2 <http://schema.org/keywords> ?v7.
+	?v2 <http://schema.org/contentRating> ?v6.
+	?v2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?v3.
+	?v0 <http://ogp.me/ns#tag> ?v1.
+}

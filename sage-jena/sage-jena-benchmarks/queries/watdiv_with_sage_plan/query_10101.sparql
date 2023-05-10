@@ -1,0 +1,5 @@
+SELECT ?v3 ?v2 ?v0 WHERE {
+	?v0 <http://schema.org/language> <http://db.uwaterloo.ca/~galuc/wsdbm/Language4>.
+	?v0 <http://schema.org/producer> ?v2.
+	?v0 <http://db.uwaterloo.ca/~galuc/wsdbm/hasGenre> ?v3.
+}
