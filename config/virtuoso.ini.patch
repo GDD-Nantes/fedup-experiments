@@ -1,0 +1,41 @@
+--- virtuoso-opensource-7.2.7/var/lib/virtuoso/db/virtuoso.ini.orig	2023-06-27 11:11:21.864092928 +0200
++++ virtuoso-opensource-7.2.7/var/lib/virtuoso/db/virtuoso.ini	2023-06-27 11:16:24.960092928 +0200
+@@ -77,12 +77,12 @@
+ PrefixResultNames               = 0
+ MacSpotlight                    = 0
+ IndexTreeMaps                   = 64
+-MaxQueryMem 		 	= 2G		; memory allocated to query processor
++MaxQueryMem 		 	= 8G		; memory allocated to query processor
+ VectorSize 		 	= 1000		; initial parallel query vector (array of query operations) size
+ MaxVectorSize 		 	= 1000000	; query vector size threshold.
+-AdjustVectorSize 	 	= 0
+-ThreadsPerQuery 	 	= 4
+-AsyncQueueMaxThreads 	 	= 10
++AdjustVectorSize 	 	= 1
++ThreadsPerQuery 	 	= 8
++AsyncQueueMaxThreads 	 	= 16
+ ;;
+ ;; When running with large data sets, one should configure the Virtuoso
+ ;; process to use between 2/3 to 3/5 of free system memory and to stripe
+@@ -101,8 +101,8 @@
+ ;NumberOfBuffers          = 1360000
+ ;MaxDirtyBuffers          = 1000000
+ ;; Uncomment next two lines if there is 32 GB system memory free
+-;NumberOfBuffers          = 2720000
+-;MaxDirtyBuffers          = 2000000
++NumberOfBuffers          = 2720000
++MaxDirtyBuffers          = 2000000
+ ;; Uncomment next two lines if there is 48 GB system memory free
+ ;NumberOfBuffers          = 4000000
+ ;MaxDirtyBuffers          = 3000000
+@@ -113,8 +113,8 @@
+ ;; Note the default settings will take very little memory
+ ;; but will not result in very good performance
+ ;;
+-NumberOfBuffers          = 10000
+-MaxDirtyBuffers          = 6000
++;NumberOfBuffers          = 10000
++;MaxDirtyBuffers          = 6000
+ 
+ 
+ [HTTPServer]

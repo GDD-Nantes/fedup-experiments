@@ -1,39 +1,50 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
+	
+	<!-- <parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.0.6</version>
 		<relativePath/>
+	</parent> -->
+	<parent>
+		<groupId>fr.univ-nantes.gdd</groupId>
+		<artifactId>fedup-xp</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-  	<groupId>fr.univ-nantes.gdd</groupId>
+  	
+	<groupId>fr.univ-nantes.gdd</groupId>
   	<artifactId>fedup</artifactId>
   	<version>0.0.1-SNAPSHOT</version>
-  	<name>SemCat</name>
-	<description>Experimental engine for the FedUP paper</description>
+	<packaging>jar</packaging>
+	
 	<properties>
-		<java.version>20</java.version>
+		<spring-boot.version>3.0.6</spring-boot.version>
 	</properties>
-  	<build>
+  	
+	<build>
   		<plugins>
-  			<plugin>   
+  			<!-- <plugin>   
         		<artifactId>maven-compiler-plugin</artifactId>
         		<version>3.3</version>
         		<configuration>
             		<source>1.8</source>
             		<target>1.8</target>
         		</configuration>
-    		</plugin>
+    		</plugin> -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring-boot.version}</version>
 			</plugin>
 		</plugins>
   	</build>
-  	<dependencies>
+  	
+	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<version>${spring-boot.version}</version>
 			<!-- <exclusions>
 				<exclusion>
 					<groupId>org.springframework.boot</groupId>
@@ -42,33 +53,77 @@
 			</exclusions> -->
 		</dependency>
 		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>11.0.15</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.15.2</version>
+		</dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-log4j2</artifactId>
-		</dependency>
+			<version>${spring-boot.version}</version>
+		</dependency> -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<version>${spring-boot.version}</version>
 			<scope>test</scope>
 		</dependency>
   		<dependency>
         	<groupId>com.blazegraph</groupId>
         	<artifactId>bigdata-core</artifactId>
         	<version>2.1.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
     	</dependency>
 		<dependency>
 			<groupId>fr.gdd.sage</groupId>
   			<artifactId>jena-sampling</artifactId>
 			<version>0.0.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-simple</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.aksw</groupId>
+			<groupId>fr.univ-nantes.gdd</groupId>
 			<artifactId>fedx</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+			<!-- <exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions> -->
 		</dependency>
 		<dependency>
-			<groupId>org.aksw</groupId>
-			<artifactId>costfed-core</artifactId>
+			<groupId>fr.univ-nantes.gdd</groupId>
+			<artifactId>costfed</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+			<!-- <exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions> -->
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.rdf4j</groupId>

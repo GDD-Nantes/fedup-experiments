@@ -1,6 +1,6 @@
 /.classpath
 /.project
 /.settings
-/*.db
 /target
-
+/summaries/*.data
+/*.db
