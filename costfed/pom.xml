@@ -71,7 +71,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>fr.univ-nantes.gdd</groupId>
+      <groupId>com.fluidops</groupId>
       <artifactId>fedx</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>

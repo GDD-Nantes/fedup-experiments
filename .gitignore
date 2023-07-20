@@ -15,3 +15,9 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+apache-jena-*
+summaries
+datasets
+queries
+output
+.snakemake

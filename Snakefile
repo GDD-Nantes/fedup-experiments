@@ -10,7 +10,7 @@ import subprocess
 TIMEOUT = config.setdefault("timeout", 600) # 10 minutes
 XPDIR = config.setdefault("xpdir", "output")
 RESTART = config.setdefault("restart", False)
-
+VIRTUOSO_PORT = config.setdefault("virtuoso_port", 8890)
 VIRTUOSO = config.setdefault("virtuoso", "/usr/local")
 
 def get_pid(port):
@@ -24,21 +24,34 @@ def get_pid(port):
         pass
     return pid
 
+def ping(endpoint):
+    proxies = {
+        "http": "",
+        "https": "",
+    }
+    try:
+        response = requests.get(endpoint, proxies=proxies)
+        # print(response.status_code, response.text)
+        return response.status_code
+    except: return -1
+
 def start_virtuoso():
-    if get_pid(8890) is not None:
+    if ping(f"http://localhost:{VIRTUOSO_PORT}/sparql") == 200:
         print("Virtuoso is running")
         return
-    print("Running virtuoso")
-    with open("virtuoso.log", "a+") as logfile:
-        subprocess.Popen([
-            f"{VIRTUOSO}/bin/virtuoso-t",
-            "+configfile", f"{VIRTUOSO}/var/lib/virtuoso/db/fedup.ini",
-            "+foreground"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL)
-            # stdout=logfile.fileno(),
-            # stderr=logfile.fileno())
-    time.sleep(20)
+    
+    shell("docker start docker-bsbm-virtuoso-10")
+    # print("Running virtuoso")
+    # with open("virtuoso.log", "a+") as logfile:
+    #     subprocess.Popen([
+    #         f"{VIRTUOSO}/bin/virtuoso-t",
+    #         "+configfile", f"{VIRTUOSO}/var/lib/virtuoso/db/fedup.ini",
+    #         "+foreground"],
+    #         stdout=subprocess.DEVNULL,
+    #         stderr=subprocess.DEVNULL)
+    #         # stdout=logfile.fileno(),
+    #         # stderr=logfile.fileno())
+    # time.sleep(20)
 
 def start_spring():
     if get_pid(8080) is not None:
@@ -61,9 +74,9 @@ def kill_virtuoso_and_spring():
     pid = get_pid(8080)
     if pid:
         os.kill(pid, signal.SIGKILL)
-    pid = get_pid(8890)
-    if pid:
-        os.kill(pid, signal.SIGKILL)
+    # pid = get_pid(8890)
+    # if pid:
+    #     os.kill(pid, signal.SIGKILL)
 
 def delayed_task(delay, cancel_event):
     if not cancel_event.wait(delay):

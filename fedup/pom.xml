@@ -1,6 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<!-- <parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -12,19 +14,19 @@
 		<artifactId>fedup-xp</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-  	
+
 	<groupId>fr.univ-nantes.gdd</groupId>
-  	<artifactId>fedup</artifactId>
-  	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>fedup</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	
+
 	<properties>
 		<spring-boot.version>3.0.6</spring-boot.version>
 	</properties>
-  	
+
 	<build>
-  		<plugins>
-  			<!-- <plugin>   
+		<plugins>
+			<!-- <plugin>   
         		<artifactId>maven-compiler-plugin</artifactId>
         		<version>3.3</version>
         		<configuration>
@@ -38,8 +40,8 @@
 				<version>${spring-boot.version}</version>
 			</plugin>
 		</plugins>
-  	</build>
-  	
+	</build>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -73,10 +75,10 @@
 			<version>${spring-boot.version}</version>
 			<scope>test</scope>
 		</dependency>
-  		<dependency>
-        	<groupId>com.blazegraph</groupId>
-        	<artifactId>bigdata-core</artifactId>
-        	<version>2.1.4</version>
+		<dependency>
+			<groupId>com.blazegraph</groupId>
+			<artifactId>bigdata-core</artifactId>
+			<version>2.1.4</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -91,10 +93,10 @@
 					<artifactId>jcl-over-slf4j</artifactId>
 				</exclusion>
 			</exclusions>
-    	</dependency>
+		</dependency>
 		<dependency>
 			<groupId>fr.gdd.sage</groupId>
-  			<artifactId>jena-sampling</artifactId>
+			<artifactId>jena-sampling</artifactId>
 			<version>0.0.1</version>
 			<exclusions>
 				<exclusion>
@@ -104,7 +106,7 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>fr.univ-nantes.gdd</groupId>
+			<groupId>com.fluidops</groupId>
 			<artifactId>fedx</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<!-- <exclusions>
@@ -115,7 +117,7 @@
 			</exclusions> -->
 		</dependency>
 		<dependency>
-			<groupId>fr.univ-nantes.gdd</groupId>
+			<groupId>org.aksw</groupId>
 			<artifactId>costfed</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<!-- <exclusions>
@@ -135,5 +137,5 @@
 			<artifactId>opencsv</artifactId>
 			<version>5.7.1</version>
 		</dependency>
-  	</dependencies>
+	</dependencies>
 </project>
