@@ -56,6 +56,8 @@ public class FedUPQueryExecutor {
         }
         long endTime = System.currentTimeMillis();
         
+        // TODO: Returns solutions
+        spy.solutions = resultsManager.getRawSolutions();
         spy.numSolutions += resultsManager.getSolutions().size();
         spy.executionTime = endTime - startTime;
     }
@@ -65,11 +67,13 @@ public class FedUPQueryExecutor {
         private int remainingProducers;
         private long limit;
         private List<Integer> solutions;
+        private List<String> solutions_raw;
 
         public ResultsManager(int numProducers, long limit) {
             this.remainingProducers = numProducers;
             this.limit = limit;
             this.solutions = new ArrayList<>();
+            this.solutions_raw = new ArrayList<>();
         }
 
         public synchronized void waitForResults() {
@@ -82,6 +86,7 @@ public class FedUPQueryExecutor {
 
         public synchronized boolean addSolution(BindingSet solution) {
             this.solutions.add(solution.toString().hashCode());
+            this.solutions_raw.add(solution.toString());
             notifyAll();
             return this.solutions.size() >= this.limit;
         }
@@ -93,6 +98,10 @@ public class FedUPQueryExecutor {
 
         public List<Integer> getSolutions() {
             return this.solutions;
+        }
+
+        public List<String> getRawSolutions() {
+            return this.solutions_raw;
         }
     }
 }

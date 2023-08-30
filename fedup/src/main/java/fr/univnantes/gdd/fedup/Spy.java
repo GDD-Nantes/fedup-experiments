@@ -1,5 +1,6 @@
 package fr.univnantes.gdd.fedup;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,4 +18,6 @@ public class Spy {
     public int numValidAssignments = 0;
     public long tpwss = 0;
     public List<Map<String, String>> assignments = null;
+    public Map<String, String> tpAliases = new HashMap<>();
+    public List<String> solutions = null;
 }

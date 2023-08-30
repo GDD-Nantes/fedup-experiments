@@ -58,12 +58,13 @@ def start_spring():
         print("Spring is running")
         return
     print("Running spring")
-    with open("fedup.log", "a+") as logfile:
+    with open("fedup.log", "w+") as logfile:
         subprocess.Popen([
-            "mvn", "spring-boot:run", "-pl", "fedup",
+            "mvn", f"-Dmaven.repo.local={os.getcwd()}/.m2/repository", "spring-boot:run", "-pl", "fedup",
             "-Dspring-boot.run.jvmArguments=\"-Xms4096M\"",
             "-Dspring-boot.run.jvmArguments=\"-Xmx8192M\"",
             "-Dspring-boot.run.jvmArguments=\"-XX:TieredStopAtLevel=4\""],
+            shell=True,
             # stdout=subprocess.DEVNULL,
             # stderr=subprocess.DEVNULL)
             stdout=logfile.fileno(),
@@ -138,7 +139,9 @@ def zero_result(status):
         "tpwss": 0,
         "provenanceMappings": "[]",
         "solutions": "[]",
-        "assignments": "[]"}
+        "assignments": "[]",
+        "tpAliases": "[]"
+    }
 
 def extend_and_format_result(result, wcs):
     columns = list(result.keys())
@@ -220,7 +223,9 @@ rule run_query:
                 "queryString": query,
                 "configFileName": f"{os.getcwd()}/{input.config}",
                 "endpointsFileName": f"{os.getcwd()}/{input.endpoints}",
+                "solutions": [],
                 "assignments": [],
+                "tpAliases": [],
                 "runQuery": True})
             if result["status"] != "OK":
                 blacklist(wildcards, result["status"])
@@ -244,6 +249,7 @@ rule fedup_random_walks_efficiency:
             with open(str(input.query)) as reader:
                 query = reader.read()
             optimalAssignments = pandas.read_csv(str(input.optimal))["assignments"].values[0]
+            print(optimalAssignments)
             optimalAssignments = optimalAssignments.replace("\'", "\"")
             optimalAssignments = json.loads(optimalAssignments)
             result = run({

@@ -84,6 +84,7 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
 
         ImmutablePair<String, List<StatementPattern>> sourceSelectionQuery = this.createSourceSelectionQuery(queryString);
 
+        logger.debug("Executing query...");
         long startTime = System.currentTimeMillis();
 
         Context context = dataset.getContext().copy();
@@ -96,9 +97,11 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         List<Map<String, String>> assignments = new ArrayList<>();
         Set<Integer> seen = new TreeSet<Integer>();
 
+        logger.debug("Getting results...");
         while (iterator.hasNext()) {
             Binding binding = iterator.next();
             int hashcode = binding.toString().hashCode();
+            logger.debug("Binding #" +  Integer.toString(hashcode));
             if (!seen.contains(hashcode)) {
                 seen.add(hashcode);
                 assignments.add(this.bindingToMap(binding));
@@ -108,6 +111,7 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
             }
         }
         long endTime = System.currentTimeMillis();
+        logger.debug("Query execution terminated...");
 
         spy.sourceSelectionTime = (endTime - startTime);
 
@@ -123,10 +127,13 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         for (Map<String, String> assignment: assignments) {
             Map<StatementPattern, List<StatementSource>> fedXAssignment = new HashMap<>();
             for (int i = 1; i <= sourceSelectionQuery.getRight().size(); i++) {
-                if (assignment.containsKey("g" + i)) {
+                String alias = "g"+i;
+                if (assignment.containsKey(alias)) {
                     Endpoint endpoint = Utils.getEndpointByURL(this.connection.getEndpoints(), assignment.get("g" + i));
                     StatementSource source = new StatementSource(endpoint.getId(), StatementSourceType.REMOTE);
-                    fedXAssignment.put(sourceSelectionQuery.getRight().get(i - 1), List.of(source));
+                    StatementPattern pattern = sourceSelectionQuery.getRight().get(i - 1);
+                    fedXAssignment.put(pattern, List.of(source));
+                    spy.tpAliases.put(alias, pattern.toString());
                 }
             }
             fedXAssignments.add(fedXAssignment);
@@ -219,7 +226,9 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
             queryString = queryString.replaceAll("(DISTINCT|distinct)", "");
             queryString = queryString.replaceAll("(ORDER BY|order by).*", "");
             queryString = queryString.replaceAll("(LIMIT|limit).*", "");
-            
+            // queryString = queryString.replaceAll("(FILTER|filter) \\(\\?date", "FILTER (<http://www.w3.org/2001/XMLSchema#dateTime>(CONCAT(STR(?date), \"\"\"T00:00:00\"\"\"))");
+            // System.out.println(queryString);
+
             Config config = this.connection.getFederation().getConfig();
             
             Summarizer summarizer = (Summarizer) Util.instantiate(
@@ -232,7 +241,8 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
 
             return new ImmutablePair<>(queryString, patterns);
         } catch (Exception e) {
-            throw new Exception("Error when rewriting the query", e.getCause());
+            throw e;
+            // throw new Exception("Error when rewriting the query", e.getCause());
         }
     }
 

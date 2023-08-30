@@ -21,3 +21,6 @@ datasets
 queries
 output
 .snakemake
+.m2
+.log
+cache.db
