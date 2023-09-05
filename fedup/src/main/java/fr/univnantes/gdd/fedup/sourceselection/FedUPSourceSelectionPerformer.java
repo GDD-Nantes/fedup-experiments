@@ -27,6 +27,8 @@ import org.apache.jena.sparql.util.Context;
 import org.apache.jena.tdb2.TDB2Factory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.rdf4j.RDF4JException;
+import org.eclipse.rdf4j.query.MalformedQueryException;
 import org.eclipse.rdf4j.query.algebra.LeftJoin;
 import org.eclipse.rdf4j.query.algebra.ProjectionElem;
 import org.eclipse.rdf4j.query.algebra.ProjectionElemList;
@@ -279,10 +281,15 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         private List<String> currentVars = new ArrayList<>();
 
         private String optimize(String queryString) throws Exception {
-            ParsedQuery parseQuery = new SPARQLParser().parseQuery(queryString, "http://donotcare.com/wathever");
-            this.meetNode(parseQuery.getTupleExpr());
-            this.reorderBGP();
-            return new SPARQLQueryRenderer().render(parseQuery);
+            try {
+                ParsedQuery parseQuery = new SPARQLParser().parseQuery(queryString, "http://donotcare.com/wathever");
+                this.meetNode(parseQuery.getTupleExpr());
+                this.reorderBGP();
+                return new SPARQLQueryRenderer().render(parseQuery);
+            } catch (RDF4JException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
 
         private boolean isConnected(StatementPattern pattern) {

@@ -56,7 +56,7 @@ public class FedUPController {
     }
 
 	@PostMapping("/fedSparql")
-	public Spy onFedQuery(
+		public Spy onFedQuery(
 		@RequestBody InputParameters parameters
 	) throws Exception {
 		List<String> endpoints;
