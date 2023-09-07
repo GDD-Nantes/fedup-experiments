@@ -6,6 +6,7 @@ import pandas
 import requests
 import threading
 import subprocess
+import shutil
 
 TIMEOUT = config.setdefault("timeout", 600) # 10 minutes
 XPDIR = config.setdefault("xpdir", "output")
@@ -59,12 +60,14 @@ def start_spring():
         return
     print("Running spring")
     with open("fedup.log", "w+") as logfile:
+        mvn_bin = shutil.which("mvn")
+
         subprocess.Popen([
-            "mvn", f"-Dmaven.repo.local={os.getcwd()}/.m2/repository", "spring-boot:run", "-pl", "fedup",
+            mvn_bin, f"-Dmaven.repo.local={os.getcwd()}/.m2/repository", "spring-boot:run", "-pl", "fedup",
             "-Dspring-boot.run.jvmArguments=\"-Xms4096M\"",
             "-Dspring-boot.run.jvmArguments=\"-Xmx8192M\"",
             "-Dspring-boot.run.jvmArguments=\"-XX:TieredStopAtLevel=4\""],
-            shell=True,
+            # shell=True,
             # stdout=subprocess.DEVNULL,
             # stderr=subprocess.DEVNULL)
             stdout=logfile.fileno(),

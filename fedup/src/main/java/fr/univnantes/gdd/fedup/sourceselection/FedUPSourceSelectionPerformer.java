@@ -228,8 +228,6 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
             queryString = queryString.replaceAll("(DISTINCT|distinct)", "");
             queryString = queryString.replaceAll("(ORDER BY|order by).*", "");
             queryString = queryString.replaceAll("(LIMIT|limit).*", "");
-            // queryString = queryString.replaceAll("(FILTER|filter) \\(\\?date", "FILTER (<http://www.w3.org/2001/XMLSchema#dateTime>(CONCAT(STR(?date), \"\"\"T00:00:00\"\"\"))");
-            // System.out.println(queryString);
 
             Config config = this.connection.getFederation().getConfig();
             
