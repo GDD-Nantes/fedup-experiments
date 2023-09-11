@@ -20,6 +20,7 @@ import org.eclipse.rdf4j.repository.sail.SailRepositoryConnection;
 
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
 /**
@@ -29,8 +30,11 @@ public class FedUPAskSourceSelectionPerformer extends FedUPSourceSelectionPerfor
 
     private static Logger log = LogManager.getLogger(FedUPAskSourceSelectionPerformer.class);
 
+    SailRepositoryConnection sailRepositoryConnection;
+
     public FedUPAskSourceSelectionPerformer(SailRepositoryConnection connection) throws Exception {
         super(connection);
+        this.sailRepositoryConnection = connection;
     }
 
     @Override
@@ -38,8 +42,29 @@ public class FedUPAskSourceSelectionPerformer extends FedUPSourceSelectionPerfor
         // We are guided by our summary, so we first perform random walks on it
         var withoutAsk = super.performSourceSelection(queryString, optimalAssignments, spy);
 
+        FedXSourceSelectionPerformer fedx = new FedXSourceSelectionPerformer(sailRepositoryConnection);
+        var ask = fedx.performSourceSelection(queryString, optimalAssignments, spy);
+
+        int nbRemoved = 0;
+        var withAsk = new ArrayList<>(withoutAsk);
+        for (int i = 0; i < withoutAsk.size(); ++i) {
+            // boolean toRemove = false;
+            for (StatementPattern key : withoutAsk.get(i).keySet()) {
+                if (!(ask.get(0).get(key).contains(withoutAsk.get(i).get(key).get(0)))) {
+                    nbRemoved += 1;
+                    withAsk.get(i).put(key, new ArrayList<>());
+                    // withAsk.get(i).put(key, new ArrayList<>());
+                }
+            }
+        }
+        System.out.println("Rmeoved "+ nbRemoved);
+
+
+        return withAsk;
+
+
         // then we remove sources that do not actually contribute by performing ASK queries
-        List<Endpoint> endpoints = connection.getEndpoints();
+        /* List<Endpoint> endpoints = connection.getEndpoints();
         Map<String, Endpoint> id2Endpoint = new HashMap<>(); // for convenience
         for (Endpoint endpoint : endpoints) {
             id2Endpoint.put(endpoint.getId(), endpoint);
@@ -83,22 +108,33 @@ public class FedUPAskSourceSelectionPerformer extends FedUPSourceSelectionPerfor
 
         // remove rows of statements that supposed a source existed while it does not
         // var withAsk = new ArrayList<Map<StatementPattern, List<StatementSource>>>();
+        // List<Map<StatementPattern, List<StatementSource>>>
+        var withAsk = new ArrayList<>(withoutAsk);
+
+        System.out.println("NB Stmt: " + stmt2Sources.size());
+        for (StatementPattern pattern : stmt2Sources.keySet()) {
+            System.out.println(String.format("%s => %s", pattern, stmt2Sources.get(pattern)));
+        }
+
+
+        int nbRemoved = 0;
         for (int i = 0; i < withoutAsk.size(); ++i) {
             // boolean toRemove = false;
-            for (Map.Entry<StatementPattern, List<StatementSource>> entry : withoutAsk.get(i).entrySet()) {
-                if (!(stmt2Sources.containsKey(entry.getKey()) &&
-                        stmt2Sources.get(entry.getKey()).containsAll(entry.getValue()))) {
-                    withoutAsk.get(i).remove(entry.getKey());
-                    i -= 1;
+            for (StatementPattern key : withoutAsk.get(i).keySet()) {
+                if (!(stmt2Sources.containsKey(key) &&
+                        stmt2Sources.get(key).containsAll(withAsk.get(i).get(key)))) {
+                    nbRemoved += 1;
+                    withAsk.get(i).put(key, new ArrayList<>()); //empty sources
+                    // i -= 1;
                 }
             }
             // if (!toRemove) {
             //     withAsk.add(withoutAsk.get(i));
             // }
         }
+        System.out.println(String.format("Removed %s sources.", nbRemoved));*/
 
-
-        return withoutAsk; // is actually with ASK now
+        // return withAsk; // is actually with ASK now
     }
 
 
@@ -107,6 +143,7 @@ public class FedUPAskSourceSelectionPerformer extends FedUPSourceSelectionPerfor
 
         public MeowSourceSelection(List<Endpoint> endpoints, Cache cache, QueryInfo queryInfo, Spy spy) {
             super(endpoints, cache, queryInfo);
+            stmtToSources = new ConcurrentHashMap<>();
             this.spy = spy;
         }
 

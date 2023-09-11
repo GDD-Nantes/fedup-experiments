@@ -147,7 +147,7 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         return fedXAssignments;
     }
 
-    private int countMissingAssignments(List<Map<String, String>> sourceSelection, List<Map<String, String>> optimalSourceSelection) {
+    static int countMissingAssignments(List<Map<String, String>> sourceSelection, List<Map<String, String>> optimalSourceSelection) {
         int missingAssignments = 0;
         for (Map<String, String> binding: optimalSourceSelection) {
             boolean found = false;
@@ -176,18 +176,25 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         return bindingAsMap;
     }
 
-    private List<Map<String, String>> removeInclusions(List<Map<String, String>> sourceSelection) {
+    static List<Map<String, String>> removeInclusions(List<Map<String, String>> sourceSelection) {
+        List<Map<String, String>> withoutDuplicates = new ArrayList<>();
+        for (Map<String, String> e1 : sourceSelection) {
+            if (!(withoutDuplicates.contains(e1))) {
+                withoutDuplicates.add(e1);
+            }
+        }
+
         List<Map<String, String>> newSourceSelection = new ArrayList<>();
-        for (int i = 0; i < sourceSelection.size(); i++) {
+        for (int i = 0; i < withoutDuplicates.size(); i++) {
             boolean keep = true;
-            for (int j = 0; j < sourceSelection.size(); j++) {
-                if (i != j && sourceSelection.get(j).entrySet().containsAll(sourceSelection.get(i).entrySet())) {
+            for (int j = 0; j < withoutDuplicates.size(); j++) {
+                if (i != j && withoutDuplicates.get(j).entrySet().containsAll(withoutDuplicates.get(i).entrySet())) {
                     keep = false;
                     break;
                 }
             }
             if (keep) {
-                newSourceSelection.add(sourceSelection.get(i));
+                newSourceSelection.add(withoutDuplicates.get(i));
             }
         }
         return newSourceSelection;
