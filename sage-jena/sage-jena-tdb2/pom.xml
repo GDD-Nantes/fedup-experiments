@@ -42,6 +42,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>fr.gdd.sage</groupId>
+      <artifactId>sage-jena-databases</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -55,8 +61,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
       </plugin>
-
     </plugins>
   </build>
-  
+
 </project>

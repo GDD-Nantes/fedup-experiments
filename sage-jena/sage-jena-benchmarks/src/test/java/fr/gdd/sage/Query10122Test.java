@@ -3,7 +3,8 @@ package fr.gdd.sage;
 import fr.gdd.sage.arq.OpExecutorSage;
 import fr.gdd.sage.arq.QueryEngineSage;
 import fr.gdd.sage.arq.SageConstants;
-import fr.gdd.sage.datasets.Watdiv10M;
+import fr.gdd.sage.databases.persistent.Watdiv10M;
+import fr.gdd.sage.generics.Pair;
 import fr.gdd.sage.io.SageInput;
 import org.apache.jena.query.*;
 import org.apache.jena.sparql.engine.main.OpExecutorFactory;
@@ -27,21 +28,21 @@ import java.util.Optional;
  * I experienced 24s/op vs 36s/op possibly due to garbage collection.
  **/
 class Query10122Test {
-    Logger log = LoggerFactory.getLogger(Query10122Test.class);
+    private static Logger log = LoggerFactory.getLogger(Query10122Test.class);
 
     static Dataset dataset;
 
     static OpExecutorFactory opExecutorTDB2ForceOrderFactory;
 
-    String query = "SELECT ?v6 ?v5 ?v8 ?v3 ?v0 ?v7 ?v4 ?v2 WHERE {"+
-            " ?v0 <http://xmlns.com/foaf/age> <http://db.uwaterloo.ca/~galuc/wsdbm/AgeGroup2>. "+
-            " ?v0 <http://schema.org/nationality> ?v8. "+
-            " ?v2 <http://schema.org/eligibleRegion> ?v8. " +
-            " ?v2 <http://purl.org/goodrelations/validFrom> ?v5. "+
-            " ?v2 <http://purl.org/goodrelations/validThrough> ?v6. "+
-            " ?v2 <http://purl.org/goodrelations/includes> ?v3. "+
-            " ?v2 <http://schema.org/eligibleQuantity> ?v7. "+
-            " ?v2 <http://purl.org/goodrelations/price> ?v4."+
+    String query = "SELECT ?v6 ?v8 ?v0 ?v7 ?v3 ?v4 ?v1 ?v2 WHERE {\n" +
+            "\t?v1 <http://schema.org/priceValidUntil> ?v8.\n" +
+            "\t?v1 <http://purl.org/goodrelations/validFrom> ?v2.\n" +
+            "\t?v1 <http://purl.org/goodrelations/validThrough> ?v3.\n" +
+            "\t?v1 <http://schema.org/eligibleQuantity> ?v6.\n" +
+            "\t?v0 <http://purl.org/goodrelations/offers> ?v1.\n" +
+            "\t?v1 <http://schema.org/eligibleRegion> ?v7.\n" +
+            "\t?v4 <http://schema.org/nationality> ?v7.\n" +
+            "\t?v4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://db.uwaterloo.ca/~galuc/wsdbm/Role0>.\n" +
             "}";
 
     @BeforeAll
@@ -49,7 +50,7 @@ class Query10122Test {
         Field plainFactoryField = ReflectionUtils._getField(OpExecutorTDB2.class, "plainFactory");
         opExecutorTDB2ForceOrderFactory = (OpExecutorFactory) ReflectionUtils._callField(plainFactoryField, OpExecutorTDB2.class, null);
 
-        Optional dirPath_opt = Optional.of("target");
+        Optional dirPath_opt = Optional.of("../datasets");
         Watdiv10M watdiv = new Watdiv10M(dirPath_opt); // creates the db if need be
         dataset = TDB2Factory.connectDataset(watdiv.dbPath_asStr);
         dataset.begin(ReadWrite.READ);
@@ -121,27 +122,22 @@ class Query10122Test {
         QueryEngineSage.register();
 
         SageInput<?> input = new SageInput<>();
-        Context c = dataset.getContext().copy().set(SageConstants.input, input);
-        c.set(ARQ.optimization, false);
+        // Context c = dataset.getContext().set(SageConstants.input, input);
+        dataset.getContext().set(ARQ.optimization, false);
+        /*dataset.getContext().set(SageConstants.timeout, 1000);
 
-        QueryExecution queryExecution = null;
-        try {
-            queryExecution = QueryExecution.create()
-                    .dataset(dataset)
-                    .context(c)
-                    .query(query).build();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        System.out.println("FIRST");
+        Pair results = ExecuteUtils.executeTillTheEnd(dataset, query);
 
-        long nbResults = 0;
-        ResultSet rs = queryExecution.execSelect() ;
-        while (rs.hasNext()) {
-            rs.next();
-            nbResults+=1;
-        }
 
-        log.info("Got {} results…", nbResults);
+        log.info("Got {} results in {} pause(s)/resume(s)…", results.left, results.right);*/
+
+        dataset.getContext().set(SageConstants.timeout, 1);
+
+        System.out.println("SECOND");
+        Pair results = ExecuteUtils.executeTillTheEnd(dataset, query);
+
+        log.info("Got {} results in {} pause(s)/resume(s)…", results.left, results.right);
     }
 
     @Test

@@ -10,10 +10,10 @@ import org.apache.jena.dboe.base.record.RecordFactory;
 import org.apache.jena.dboe.base.record.RecordMapper;
 import org.apache.jena.tdb2.lib.TupleLib;
 import org.apache.jena.tdb2.store.NodeId;
-import org.apache.jena.tdb2.store.tupletable.TupleIndexRecord;
 import org.apache.jena.util.iterator.NullIterator;
 import org.apache.jena.util.iterator.SingletonIterator;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Objects;
 
@@ -25,7 +25,7 @@ import java.util.Objects;
  * find out the boundary of the scan and draw a random element from
  * it.
  **/
-public class PreemptJenaIterator implements BackendIterator<NodeId, SerializableRecord> {
+public class PreemptJenaIterator extends ProgressJenaIterator implements BackendIterator<NodeId, Serializable> {
     BPlusTree tree = null;
     Record min = null;
     Record max = null;
@@ -39,6 +39,7 @@ public class PreemptJenaIterator implements BackendIterator<NodeId, Serializable
     Iterator<Tuple<NodeId>> wrapped;
 
     public PreemptJenaIterator(PreemptTupleIndexRecord ptir, Record min, Record max) {
+        super(ptir, min, max);
         this.min = min;
         this.max = max;
         this.tree = ptir.bpt;
@@ -52,6 +53,7 @@ public class PreemptJenaIterator implements BackendIterator<NodeId, Serializable
      * Null Iterator, does not need any preemptive behavior.
      **/
     public PreemptJenaIterator() {
+        super();
         this.wrapped = new NullIterator<>();
     }
 
@@ -64,6 +66,7 @@ public class PreemptJenaIterator implements BackendIterator<NodeId, Serializable
      * needed for `previous()`/`current()` and `skip(to)` as well.
      */
     public PreemptJenaIterator(PreemptTupleIndexRecord ptir, Tuple<NodeId> pattern) {
+        super(ptir, pattern);
         this.tree = ptir.bpt;
         this.mapper = ptir.getRecordMapper();
         this.recordFactory = ptir.recordFactory;
@@ -75,6 +78,7 @@ public class PreemptJenaIterator implements BackendIterator<NodeId, Serializable
         return this.wrapped instanceof SingletonIterator;
     }
 
+    /* ************************************************************************************* */
 
     public Tuple<NodeId> getCurrentTuple() {
         return current;
@@ -115,8 +119,9 @@ public class PreemptJenaIterator implements BackendIterator<NodeId, Serializable
     }
 
     @Override
-    public void skip(SerializableRecord to) {
-        if (Objects.isNull(to) || Objects.isNull(to.record)) {
+    public void skip(Serializable toNotCast) {
+        SerializableRecord to = (SerializableRecord) toNotCast;
+        if (Objects.isNull(to) || Objects.isNull(to.getRecord())) {
             // Corner case where an iterator indeed saved
             // its `previous()` but since this is the first
             // iteration, it is `null`. We still need to stay
@@ -133,23 +138,26 @@ public class PreemptJenaIterator implements BackendIterator<NodeId, Serializable
             return;
         }
 
-        wrapped = tree.iterator(to.record, max, mapper);
+        wrapped = tree.iterator(to.getRecord(), max, mapper);
 
         // We are voluntarily one step behind with the saved
         // `Record`. Calling `hasNext()` and `next()` recover
         // a clean internal state.
         hasNext();
         next();
+        super.skip(to.getOffset());
     }
 
     @Override
-    public SerializableRecord current() {
-        return Objects.isNull(current) ? null : new SerializableRecord(TupleLib.record(recordFactory, current, tupleMap));
+    public Serializable current() {
+        return Objects.isNull(current) ? null :
+                new SerializableRecord(TupleLib.record(recordFactory, current, tupleMap), (Long) super.current());
     }
 
     @Override
-    public SerializableRecord previous() {
-        return Objects.isNull(previous) ? null : new SerializableRecord(TupleLib.record(recordFactory, previous, tupleMap));
+    public Serializable previous() {
+        return Objects.isNull(previous) ? null :
+                new SerializableRecord(TupleLib.record(recordFactory, previous, tupleMap), (Long) super.previous());
     }
     
     @Override
@@ -159,6 +167,7 @@ public class PreemptJenaIterator implements BackendIterator<NodeId, Serializable
 
     @Override
     public void next() {
+        super.next();
         previous = current;
         current = wrapped.next();
     }

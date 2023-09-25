@@ -188,7 +188,7 @@ wildcard_constraints:
     query = "[A-z0-9]+",
     run = "[0-9]+",
     workload = "(largerdfbench|fedshop)",
-    approach = "(fedx|hibiscus(-index)?|costfed(-index|-noopt)?|fedup(-id|-h0)-optimal)",
+    approach = "(fedx|hibiscus(-index)?|costfed(-index|-noopt)?|fedup(-id|-h0|-h10|-h100)-optimal)",
     xpdir = "[A-z0-9\-]+"
 
 rule all:
@@ -245,7 +245,7 @@ rule fedup_random_walks_efficiency:
         config = "config/{workload}/{approach}.props",
         endpoints = "config/{workload}/endpoints.txt",
         optimal = "{xpdir}/{workload}/fedup-id-optimal/{query}.1.csv"
-    output: "{xpdir}/{workload}/{approach,fedup(-id|-h0)}/{query}.{run}.csv"
+    output: "{xpdir}/{workload}/{approach,fedup(-id|-h0|-h10|-h100)}/{query}.{run}.csv"
     run:
         reason = is_blacklist(wildcards)
         if reason is None:
@@ -253,13 +253,14 @@ rule fedup_random_walks_efficiency:
                 query = reader.read()
             optimalAssignments = pandas.read_csv(str(input.optimal))["assignments"].values[0]
             print(optimalAssignments)
-            optimalAssignments = optimalAssignments.replace("\'", "\"")
-            optimalAssignments = json.loads(optimalAssignments)
+            # optimalAssignments = optimalAssignments.replace("\'", "\"")
+            # optimalAssignments = json.loads(optimalAssignments)
             result = run({
                 "queryString": query,
                 "configFileName": f"{os.getcwd()}/{input.config}",
                 "endpointsFileName": f"{os.getcwd()}/{input.endpoints}",
-                "assignments": optimalAssignments,
+                # "assignments": optimalAssignments,
+		"assignments": [],
                 "runQuery": True})
             if result["status"] != "OK":
                 blacklist(wildcards, result["status"])

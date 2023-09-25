@@ -1,6 +1,5 @@
 package fr.gdd.sage.arq;
 
-import org.apache.jena.atlas.lib.Lib;
 import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.algebra.Op;
@@ -8,18 +7,15 @@ import org.apache.jena.sparql.algebra.OpLib;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.engine.*;
 import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.iterator.PreemptCounterIter;
-import org.apache.jena.sparql.engine.iterator.QueryIterRoot;
-import org.apache.jena.sparql.engine.iterator.QueryIteratorCheck;
-import org.apache.jena.sparql.engine.iterator.QueryIteratorTiming;
+import org.apache.jena.sparql.engine.iterator.*;
 import org.apache.jena.sparql.engine.main.QC;
 import org.apache.jena.sparql.mgt.Explain;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.tdb2.TDB2;
-import org.apache.jena.tdb2.TDBException;
 import org.apache.jena.tdb2.solver.QueryEngineTDB;
 import org.apache.jena.tdb2.store.DatasetGraphTDB;
-import org.apache.jena.tdb2.sys.TDBInternal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Instead of relying on {@link org.apache.jena.tdb2.solver.QueryEngineTDB} to
@@ -27,6 +23,8 @@ import org.apache.jena.tdb2.sys.TDBInternal;
  * counter in top of the execution pipeline.
  */
 public class QueryEngineSage extends QueryEngineTDB {
+
+    private static Logger log = LoggerFactory.getLogger(QueryEngineSage.class);
 
     protected QueryEngineSage(Op op, DatasetGraphTDB dataset, Binding input, Context context) {
         super(op, dataset, input, context);
@@ -50,6 +48,8 @@ public class QueryEngineSage extends QueryEngineTDB {
 
     @Override
     public QueryIterator eval(Op op, DatasetGraph dsg, Binding input, Context context) {
+        // (TODO) put Sage Optimizer for join order here, or copy TDB Order as well.
+
         // #1 an explain that comes from {@link QueryEngineTDB}
         if ( isUnionDefaultGraph(context) && ! isDynamicDataset() ) {
             op = OpLib.unionDefaultGraphQuads(op) ;
@@ -57,21 +57,28 @@ public class QueryEngineSage extends QueryEngineTDB {
         }
 
         // #2 comes from {@link QueryEngineBase}
-        ExecutionContext execCxt = new ExecutionContext(context, dsg.getDefaultGraph(), dsg, QC.getFactory(context)) ;
+        ExecutionContext execCxt = new ExecutionContext(context, dsg.getDefaultGraph(), dsg, QC.getFactory(context));
+        IdentifierLinker.create(execCxt, op, true);
+
         QueryIterator qIter1 =
                 ( input.isEmpty() ) ? QueryIterRoot.create(execCxt)
                         : QueryIterRoot.create(input, execCxt);
-        QueryIterator qIter = QC.execute(op, qIter1, execCxt) ;
+        QueryIterator qIter = QC.execute(op, qIter1, execCxt);
 
         // #3 in between we add our home-made counter iterator :)
         PreemptCounterIter counterIter = new PreemptCounterIter(qIter, execCxt);
 
+
+
         // Wrap with something to check for closed iterators.
-        qIter = QueryIteratorCheck.check(counterIter, execCxt) ;
+        qIter = QueryIteratorCheck.check(counterIter, execCxt);
         // Need call back.
         if ( context.isTrue(ARQ.enableExecutionTimeLogging) )
-            qIter = QueryIteratorTiming.time(qIter) ;
-        return qIter ;
+            qIter = QueryIteratorTiming.time(qIter);
+
+        // #4 wraps it in a root that handle pause exceptions
+        PreemptRootIter preemptRootIter = new PreemptRootIter(qIter, execCxt);
+        return preemptRootIter;
     }
 
     // ---- Factory

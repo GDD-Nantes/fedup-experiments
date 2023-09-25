@@ -5,6 +5,8 @@ import fr.gdd.sage.io.SageOutput;
 import org.apache.jena.sparql.engine.ExecutionContext;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -13,6 +15,8 @@ import org.apache.jena.sparql.engine.binding.Binding;
  * reached.
  **/
 public class PreemptCounterIter extends QueryIter1 {
+
+    private static Logger log = LoggerFactory.getLogger(PreemptCounterIter.class);
 
     SageOutput<?> output;
 
@@ -34,10 +38,8 @@ public class PreemptCounterIter extends QueryIter1 {
     @Override
     protected Binding moveToNextBinding() {
         output.add(null); // +1 to internal counter
-        // if (output != null) {
-        //     output.add(null); // +1 to internal counter
-        // }
-        return getInput().nextBinding();
+        Binding res = getInput().nextBinding();
+        return res;
     }
 
     @Override

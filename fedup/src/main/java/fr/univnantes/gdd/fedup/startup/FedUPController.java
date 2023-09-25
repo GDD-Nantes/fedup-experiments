@@ -84,13 +84,19 @@ public class FedUPController {
 
 		// logger.debug("Assignments: " + assignments);
 
+		// global assign so FedX can pick its source assignments one by one afterward
 		SourceAssignments sourceSelection = SourceAssignments.getInstance();
 		Collections.shuffle(assignments);
 		sourceSelection.setAssignments(assignments);
-		
+
+		// (TODO) RDF4J does not support values
+		// (TODO) ugly testing by quickly removing the values
+		// String queryString = parameters.queryString.replaceAll("(VALUES|values).*", "");
+		String queryString = parameters.queryString;
+		System.out.println(queryString);
 		if (parameters.runQuery) {
 			FedUPQueryExecutor executor = new FedUPQueryExecutor(connection);
-			executor.execute(parameters.queryString, sourceSelection, spy);
+			executor.execute(queryString, sourceSelection, spy);
 		}
 
 		logger.info("Source Selection Time: " + spy.sourceSelectionTime + "ms");

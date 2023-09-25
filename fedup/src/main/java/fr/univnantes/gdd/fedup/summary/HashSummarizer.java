@@ -10,13 +10,12 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.sparql.algebra.Algebra;
-import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.algebra.OpAsQuery;
-import org.apache.jena.sparql.algebra.OpVisitorBase;
-import org.apache.jena.sparql.algebra.OpWalker;
+import org.apache.jena.sparql.algebra.*;
 import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpFilter;
+import org.apache.jena.sparql.algebra.op.OpQuad;
 import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.core.Var;
 
 public class HashSummarizer extends Summarizer {
 
@@ -44,7 +43,7 @@ public class HashSummarizer extends Summarizer {
         } else if (node.isLiteral()) {
             return NodeFactory.createLiteral("any");
         } else {
-            return NodeFactory.createVariable(node.getName()); 
+            return Var.alloc(node.getName());
         }
     }
 
@@ -96,4 +95,21 @@ public class HashSummarizer extends Summarizer {
         // return OpAsQuery.asQuery(op);
     }
 
+    @Override
+    public Op summarize(Op op) {
+        OpWalker.walk(op, new OpVisitorBase() {
+            @Override
+            public void visit(final OpBGP opBGP) {
+                List<Triple> triples = opBGP.getPattern().getList().stream().map(triple -> {
+                    return summarize(triple);
+                }).collect(Collectors.toList());
+                opBGP.getPattern().getList().clear();
+                opBGP.getPattern().getList().addAll(triples);
+            }
+        });
+
+        op = Transformer.transform(new RemoveFilterTransformerLol(), op);
+
+        return op;
+    }
 }

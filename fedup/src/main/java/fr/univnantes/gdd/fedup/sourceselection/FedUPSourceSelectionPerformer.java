@@ -1,37 +1,39 @@
 package fr.univnantes.gdd.fedup.sourceselection;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
+import com.fluidops.fedx.Config;
+import com.fluidops.fedx.Util;
+import com.fluidops.fedx.algebra.StatementSource;
+import com.fluidops.fedx.algebra.StatementSource.StatementSourceType;
+import com.fluidops.fedx.structures.Endpoint;
+import fr.gdd.raw.QueryEngineRAW;
+import fr.gdd.raw.RAWConstants;
+import fr.gdd.raw.io.RAWInput;
+import fr.univnantes.gdd.fedup.Spy;
+import fr.univnantes.gdd.fedup.ToSourceSelectionQueryTransform;
+import fr.univnantes.gdd.fedup.Utils;
+import fr.univnantes.gdd.fedup.summary.Summarizer;
+import fr.univnantes.gdd.fedup.transforms.ToSourceSelectionTransforms;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.TxnType;
+import org.apache.jena.sparql.algebra.Algebra;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.Transformer;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.Plan;
 import org.apache.jena.sparql.engine.QueryEngineFactory;
-import org.apache.jena.sparql.engine.QueryEngineRegistry;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingRoot;
-import org.apache.jena.sparql.engine.main.QC;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.tdb2.TDB2Factory;
+import org.apache.jena.tdb2.solver.QueryEngineTDB;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.rdf4j.RDF4JException;
-import org.eclipse.rdf4j.query.MalformedQueryException;
 import org.eclipse.rdf4j.query.algebra.LeftJoin;
-import org.eclipse.rdf4j.query.algebra.ProjectionElem;
-import org.eclipse.rdf4j.query.algebra.ProjectionElemList;
 import org.eclipse.rdf4j.query.algebra.StatementPattern;
 import org.eclipse.rdf4j.query.algebra.Union;
 import org.eclipse.rdf4j.query.algebra.helpers.AbstractQueryModelVisitor;
@@ -40,27 +42,24 @@ import org.eclipse.rdf4j.query.parser.sparql.SPARQLParser;
 import org.eclipse.rdf4j.queryrender.sparql.SPARQLQueryRenderer;
 import org.eclipse.rdf4j.repository.sail.SailRepositoryConnection;
 
-import com.fluidops.fedx.Config;
-import com.fluidops.fedx.Util;
-import com.fluidops.fedx.algebra.StatementSource;
-import com.fluidops.fedx.algebra.StatementSource.StatementSourceType;
-import com.fluidops.fedx.structures.Endpoint;
-
-import fr.gdd.sage.OpExecutorRandom;
-import fr.gdd.sage.QueryEngineRandom;
-import fr.gdd.sage.arq.OpExecutorSage;
-import fr.gdd.sage.arq.QueryEngineSage;
-import fr.gdd.sage.arq.SageConstants;
-import fr.univnantes.gdd.fedup.Spy;
-import fr.univnantes.gdd.fedup.Utils;
-import fr.univnantes.gdd.fedup.summary.Summarizer;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
 
     private static Logger logger = LogManager.getLogger(FedUPSourceSelectionPerformer.class);
 
+    Set<String> endpoints;
+    Dataset ds4Asks;
+
     public FedUPSourceSelectionPerformer(SailRepositoryConnection connection) throws Exception {
         super(connection);
+
+        // #1 transform the query to get fake ASKs
+        endpoints = this.connection.getEndpoints().stream().map(e ->
+                e.getEndpoint().substring(e.getEndpoint().indexOf("default-graph-uri=") + 18,
+                        e.getEndpoint().length())).collect(Collectors.toSet()); // get graph names from endpoints
+        ds4Asks = TDB2Factory.connectDataset(this.connection.getFederation().getConfig().getProperty("fedup.summary"));
     }
 
     @Override
@@ -75,25 +74,29 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         dataset.begin(TxnType.READ);
 
         QueryEngineFactory factory;
-        if (Boolean.parseBoolean(config.getProperty("fedup.random", "false"))) {
-            QC.setFactory(dataset.getContext(), new OpExecutorRandom.OpExecutorRandomFactory(ARQ.getContext()));
-            factory = QueryEngineRandom.factory;
+        if (false) { // TODO never random walking
+        // if (Boolean.parseBoolean(config.getProperty("fedup.random", "false"))) {
+            QueryEngineRAW.register();
+            QueryEngineTDB.unregister();
+            factory = QueryEngineRAW.factory;
         } else {
-            QC.setFactory(dataset.getContext(), new OpExecutorSage.OpExecutorSageFactory(ARQ.getContext()));
-            factory = QueryEngineSage.factory;
+            QueryEngineRAW.unregister();
+            QueryEngineTDB.register();
+            factory = QueryEngineTDB.getFactory();
         }
-        QueryEngineRegistry.addFactory(factory);
 
-        ImmutablePair<String, List<StatementPattern>> sourceSelectionQuery = this.createSourceSelectionQuery(queryString);
+        var sourceSelectionQuery = this.createSourceSelectionQuery(queryString);
+
 
         logger.debug("Executing query...");
         long startTime = System.currentTimeMillis();
 
-        Context context = dataset.getContext().copy();
-        context.set(SageConstants.timeout, timeout == 0 ? Long.MAX_VALUE : timeout);
+        Context context = dataset.getContext().copy()
+                .set(RAWConstants.timeout, timeout == 0 ? Long.MAX_VALUE : timeout)
+                .set(RAWConstants.input, new RAWInput());
 
-        Query query = QueryFactory.create(sourceSelectionQuery.getLeft());
-        Plan plan = factory.create(query, dataset.asDatasetGraph(), BindingRoot.create(), context);
+        // Query query = QueryFactory.create(sourceSelectionQuery.getLeft());
+        Plan plan = factory.create(sourceSelectionQuery.getLeft(), dataset.asDatasetGraph(), BindingRoot.create(), context);
         QueryIterator iterator = plan.iterator();
 
         List<Map<String, String>> assignments = new ArrayList<>();
@@ -103,7 +106,7 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         while (iterator.hasNext()) {
             Binding binding = iterator.next();
             int hashcode = binding.toString().hashCode();
-            logger.debug("Binding #" +  Integer.toString(hashcode));
+            // logger.debug("Binding #" +  Integer.toString(hashcode));
             if (!seen.contains(hashcode)) {
                 seen.add(hashcode);
                 assignments.add(this.bindingToMap(binding));
@@ -166,12 +169,12 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         return missingAssignments;
     }
 
-    private Map<String, String> bindingToMap(Binding binding) {
+    protected Map<String, String> bindingToMap(Binding binding) {
         Map<String, String> bindingAsMap = new HashMap<>();
         Iterator<Var> vars = binding.vars();
         while (vars.hasNext()) {
             String varName = vars.next().getName();
-            bindingAsMap.put(varName, binding.get(varName).getURI());
+            bindingAsMap.put(varName, binding.get(varName).toString());
         }
         return bindingAsMap;
     }
@@ -200,15 +203,24 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         return newSourceSelection;
     }
 
-    protected ImmutablePair<String, List<StatementPattern>> createSourceSelectionQuery(String queryString) throws Exception {
+    protected ImmutablePair<Op, List<StatementPattern>> createSourceSelectionQuery(String queryString) throws Exception {
         try {
-            queryString = new TriplePatternsReorderer().optimize(queryString);
+            // queryString = new TriplePatternsReorderer().optimize(queryString);
+            Query query = QueryFactory.create(queryString);
+            Op op = Algebra.compile(query);
+            ToSourceSelectionTransforms tsst = new ToSourceSelectionTransforms(true, endpoints, ds4Asks);
+            op = tsst.transform(op);
 
-            logger.debug("optimized query:\n" + queryString);
+
+
+            // logger.debug("optimized query:\n" + queryString);
+            // System.out.println(queryString);
+
+
 
             List<StatementPattern> patterns = Utils.getTriplePatterns(queryString);
 
-            ParsedQuery parseQuery = new SPARQLParser().parseQuery(queryString, "http://donotcare.com/wathever");
+            /* ParsedQuery parseQuery = new SPARQLParser().parseQuery(queryString, "http://donotcare.com/wathever");
 
             List<ProjectionElem> projection = new ArrayList<>();
 
@@ -230,23 +242,37 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
 
             visitor1.meetOther(parseQuery.getTupleExpr());
             visitor2.meetOther(parseQuery.getTupleExpr());
+
+
             
             queryString = new SPARQLQueryRenderer().render(parseQuery);
             queryString = queryString.replaceAll("(DISTINCT|distinct)", "");
             queryString = queryString.replaceAll("(ORDER BY|order by).*", "");
-            queryString = queryString.replaceAll("(LIMIT|limit).*", "");
+            queryString = queryString.replaceAll("(LIMIT|limit).*", "");*/
 
             Config config = this.connection.getFederation().getConfig();
-            
+
+
+
             Summarizer summarizer = (Summarizer) Util.instantiate(
-                config.getProperty("fedup.summaryClass"),
-            Integer.parseInt(config.getProperty("fedup.summaryArg", "0")));
+                    config.getProperty("fedup.summaryClass"),
+                    Integer.parseInt(config.getProperty("fedup.summaryArg", "0")));
 
-            queryString = summarizer.summarize(QueryFactory.create(queryString)).toString();
+            // summarizer before toSourceSelectionQuery Transform since it only works on triples
+            op = summarizer.summarize(op);
+            // op = Transformer.transform(new ToSourceSelectionQueryTransform(), op);
 
-            logger.debug("source selection query:\n" + queryString);
+            System.out.println(op.toString());
 
-            return new ImmutablePair<>(queryString, patterns);
+            // query = OpAsQuery.asQuery(op);
+            // queryString = query.serialize();
+            // System.out.println(queryString);
+
+
+
+            // logger.debug("source selection query:\n" + queryString);
+
+            return new ImmutablePair<>(op, patterns);
         } catch (Exception e) {
             throw e;
             // throw new Exception("Error when rewriting the query", e.getCause());

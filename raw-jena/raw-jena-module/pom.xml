@@ -1,0 +1,145 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.gdd.sage</groupId>
+  <artifactId>raw-jena-module</artifactId>
+  <name>raw-jena-module</name>
+  <packaging>jar</packaging>
+
+  <parent>
+    <groupId>fr.gdd.sage</groupId>
+    <artifactId>raw-jena</artifactId>
+    <version>0.0.1</version>
+  </parent>
+
+
+  <dependencies>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.12.0</version>
+    </dependency>
+
+    <dependency> <!-- makes use of already implem'd for compilation targeting jena -->
+      <groupId>fr.gdd.sage</groupId>
+      <artifactId>sage-jena-volcano</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>fr.gdd.sage</groupId>
+      <artifactId>sage-jena-databases</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>fr.gdd.sage</groupId>
+      <artifactId>sage-jena-module</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>fr.gdd.sage</groupId>
+      <artifactId>raw-jena-volcano</artifactId>
+    </dependency>
+
+    <dependency>
+      <!-- to get ShiroEnvironmentLoader; or
+           to get Services such as ActionServerStatus -->
+      <groupId>org.apache.jena</groupId>
+      <artifactId>jena-fuseki-webapp</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jena</groupId>
+      <artifactId>jena-fuseki-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jena</groupId>
+      <artifactId>jena-fuseki-main</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.jena</groupId>
+      <artifactId>apache-jena-libs</artifactId>
+      <type>pom</type>
+    </dependency>
+    <dependency> <!-- logger of jena -->
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <filtering>false</filtering>
+        <!-- contains a META-INF that automatically
+             registers SageModule in the life cycle -->
+        <directory>src/main/resources</directory>
+      </resource> 
+    </resources>
+    
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>fr.gdd.sage.RAWFusekiServer</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+          <mainClass>fr.gdd.sage.RAWFusekiServer</mainClass>
+        </configuration>
+      </plugin>
+      <!-- Tried to shade into one fat jar for docker, but it did not work well.
+      So instead, we export the all dependency `.jar` and update the classpath
+      accordingly. -->
+      <!--<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.5.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>-->
+
+      <!-- mvn dependency:copy-dependencies -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.0</version>
+        <configuration>
+          <outputDirectory>
+            ${project.build.directory}
+          </outputDirectory>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+  
+</project>

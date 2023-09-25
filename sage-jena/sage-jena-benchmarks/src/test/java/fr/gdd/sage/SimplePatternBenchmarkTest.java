@@ -1,6 +1,6 @@
 package fr.gdd.sage;
 
-import fr.gdd.sage.datasets.Watdiv10M;
+import fr.gdd.sage.databases.persistent.Watdiv10M;
 import org.apache.jena.query.*;
 import org.apache.jena.sparql.engine.main.OpExecutorFactory;
 import org.apache.jena.sparql.engine.main.QC;
@@ -23,7 +23,7 @@ import java.util.Optional;
  * Indeed,`jmh` starts new VMs precluding the use of debug/profiling mode…
  **/
 class SimplePatternBenchmarkTest {
-    Logger log = LoggerFactory.getLogger(SimplePatternBenchmarkTest.class);
+    private static Logger log = LoggerFactory.getLogger(SimplePatternBenchmarkTest.class);
 
     static Dataset dataset;
 

@@ -3,7 +3,7 @@ package fr.gdd.sage;
 import fr.gdd.sage.arq.OpExecutorSage;
 import fr.gdd.sage.arq.QueryEngineSage;
 import fr.gdd.sage.arq.SageConstants;
-import fr.gdd.sage.datasets.Watdiv10M;
+import fr.gdd.sage.databases.persistent.Watdiv10M;
 import fr.gdd.sage.io.SageInput;
 import org.apache.jena.query.*;
 import org.apache.jena.sparql.engine.main.OpExecutorFactory;
@@ -27,7 +27,7 @@ import java.util.Optional;
  * is far from optimal, and (ii) it contains fully bounded triples.
  **/
 class Query1000Test {
-    Logger log = LoggerFactory.getLogger(Query1000Test.class);
+    private static Logger log = LoggerFactory.getLogger(Query1000Test.class);
 
     static Dataset dataset;
 

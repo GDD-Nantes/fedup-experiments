@@ -1,8 +1,7 @@
 package fr.gdd.sage;
 
 import fr.gdd.sage.arq.SageConstants;
-import fr.gdd.sage.datasets.Watdiv10M;
-import fr.gdd.sage.fuseki.RandomModule;
+import fr.gdd.sage.databases.persistent.Watdiv10M;
 import fr.gdd.sage.fuseki.SageModule;
 import org.apache.jena.fuseki.auth.Auth;
 import org.apache.jena.fuseki.main.FusekiServer;

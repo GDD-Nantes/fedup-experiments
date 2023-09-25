@@ -1,0 +1,13 @@
+*~
+*.DS_Store
+temp/
+
+### Java
+**/webapp/
+**/target/
+.idea/
+**dependency-reduced-pom.xml
+
+### Web
+**/package-lock.json
+**/node_modules/

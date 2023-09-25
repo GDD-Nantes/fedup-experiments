@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 
 import fr.gdd.sage.arq.SageConstants;
 import org.apache.jena.sparql.engine.iterator.PreemptScanIteratorFactory;
-import fr.gdd.sage.arq.ScanIteratorFactory;
+import org.apache.jena.sparql.engine.iterator.ScanIteratorFactory;
 import org.apache.jena.atlas.iterator.Iter;
 import org.apache.jena.atlas.lib.StrUtils;
 import org.apache.jena.atlas.lib.tuple.Tuple;
@@ -29,7 +29,9 @@ public class PreemptStageMatchTuple {
     static Iterator<BindingNodeId> access(NodeTupleTable nodeTupleTable, Iterator<BindingNodeId> input, Tuple<Node> patternTuple,
                                           Predicate<Tuple<NodeId>> filter, boolean anyGraph, ExecutionContext execCxt, Integer id) {
         return Iter.flatMap(input, bnid -> {
-            return PreemptStageMatchTuple.access(nodeTupleTable, bnid, patternTuple, filter, anyGraph, execCxt, id);
+            Iterator<BindingNodeId> newIterator = PreemptStageMatchTuple.access(nodeTupleTable, bnid, patternTuple, filter, anyGraph, execCxt, id);
+
+            return newIterator;
         });
     }
 
@@ -44,7 +46,7 @@ public class PreemptStageMatchTuple {
 
         Iterator<Tuple<NodeId>> iterMatches = !b ?
                 factory.getScan(id):
-                factory.getScan(nodeTupleTable, TupleFactory.create(ids), id);
+                factory.getScan(nodeTupleTable, TupleFactory.create(ids), vars, id);
 
         // ** Allow a triple or quad filter here.
         if ( filter != null )

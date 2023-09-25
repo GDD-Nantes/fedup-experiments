@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import com.fluidops.fedx.sail.FedXSailRepositoryConnection;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.query.TupleQueryResult;
@@ -24,7 +25,7 @@ public class FedUPQueryExecutor {
     }
 
     public void execute(String queryString, SourceAssignments assignments, Spy spy) throws Exception {
-        int numSubQueries = assignments.getAssignments().size(); 
+        int numSubQueries = assignments.getAssignments().size();
 
         ExecutorService executor = Executors.newFixedThreadPool(Math.max(Math.min(numSubQueries, 8), 1));
         ResultsManager resultsManager = new ResultsManager(numSubQueries, Utils.getLimit(queryString));
