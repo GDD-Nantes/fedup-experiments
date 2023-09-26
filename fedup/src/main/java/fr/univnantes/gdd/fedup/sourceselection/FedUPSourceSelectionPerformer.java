@@ -12,6 +12,7 @@ import fr.univnantes.gdd.fedup.Spy;
 import fr.univnantes.gdd.fedup.ToSourceSelectionQueryTransform;
 import fr.univnantes.gdd.fedup.Utils;
 import fr.univnantes.gdd.fedup.summary.Summarizer;
+import fr.univnantes.gdd.fedup.transforms.Graph2TripleVisitor;
 import fr.univnantes.gdd.fedup.transforms.ToSourceSelectionTransforms;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.jena.query.Dataset;
@@ -20,7 +21,9 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.TxnType;
 import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.Transformer;
+import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.Plan;
 import org.apache.jena.sparql.engine.QueryEngineFactory;
@@ -128,15 +131,34 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         spy.numFoundAssignments = optimalAssignments.size() - this.countMissingAssignments(assignments, optimalAssignments);
 
         List<Map<StatementPattern, List<StatementSource>>> fedXAssignments = new ArrayList<>();
-        
+
+        Graph2TripleVisitor g2tp = new Graph2TripleVisitor();
+        sourceSelectionQuery.getLeft().visit(g2tp);
+
+        Map<Var, StatementPattern> var2bgp = g2tp.getVar2Triple().entrySet().stream().map(e -> {
+            OpTriple opTriple = new OpTriple(e.getValue());
+            Query query = OpAsQuery.asQuery(opTriple);
+            String tripleAsString = query.toString();
+            ParsedQuery parseQuery = new SPARQLParser().parseQuery(tripleAsString, "http://donotcare.com/wathever");
+            StatementPattern bgp = null;
+            try {
+                List<List<StatementPattern>> bgps = Utils.getBasicGraphPatterns(parseQuery);
+                bgp = bgps.get(0).get(0);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+            return Map.entry(e.getKey(), bgp);
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+
         for (Map<String, String> assignment: assignments) {
             Map<StatementPattern, List<StatementSource>> fedXAssignment = new HashMap<>();
-            for (int i = 1; i <= sourceSelectionQuery.getRight().size(); i++) {
-                String alias = "g"+i;
+            for (int i = 1; i <= var2bgp.size(); i++) {
+                String alias = "g"+i; // TODO change this
                 if (assignment.containsKey(alias)) {
                     Endpoint endpoint = Utils.getEndpointByURL(this.connection.getEndpoints(), assignment.get("g" + i));
                     StatementSource source = new StatementSource(endpoint.getId(), StatementSourceType.REMOTE);
-                    StatementPattern pattern = sourceSelectionQuery.getRight().get(i - 1);
+                    StatementPattern pattern = var2bgp.get(Var.alloc(alias));
                     fedXAssignment.put(pattern, List.of(source));
                     spy.tpAliases.put(alias, pattern.toString());
                 }
@@ -211,48 +233,9 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
             ToSourceSelectionTransforms tsst = new ToSourceSelectionTransforms(true, endpoints, ds4Asks);
             op = tsst.transform(op);
 
-
-
-            // logger.debug("optimized query:\n" + queryString);
-            // System.out.println(queryString);
-
-
-
             List<StatementPattern> patterns = Utils.getTriplePatterns(queryString);
 
-            /* ParsedQuery parseQuery = new SPARQLParser().parseQuery(queryString, "http://donotcare.com/wathever");
-
-            List<ProjectionElem> projection = new ArrayList<>();
-
-            AbstractQueryModelVisitor<Exception> visitor1 = new AbstractQueryModelVisitor<Exception>() {
-                @Override
-                public void meet(StatementPattern node) throws Exception {
-                    int index = projection.size() + 1;
-                    node.setContextVar(new org.eclipse.rdf4j.query.algebra.Var("g" + index));
-                    projection.add(new ProjectionElem("g" + index));
-                }
-            };
-            
-            AbstractQueryModelVisitor<Exception> visitor2 = new AbstractQueryModelVisitor<Exception>() {
-                @Override
-                public void meet(ProjectionElemList node) throws Exception {
-                    node.setElements(projection);
-                }
-            };
-
-            visitor1.meetOther(parseQuery.getTupleExpr());
-            visitor2.meetOther(parseQuery.getTupleExpr());
-
-
-            
-            queryString = new SPARQLQueryRenderer().render(parseQuery);
-            queryString = queryString.replaceAll("(DISTINCT|distinct)", "");
-            queryString = queryString.replaceAll("(ORDER BY|order by).*", "");
-            queryString = queryString.replaceAll("(LIMIT|limit).*", "");*/
-
             Config config = this.connection.getFederation().getConfig();
-
-
 
             Summarizer summarizer = (Summarizer) Util.instantiate(
                     config.getProperty("fedup.summaryClass"),
@@ -264,13 +247,6 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
 
             System.out.println(op.toString());
 
-            // query = OpAsQuery.asQuery(op);
-            // queryString = query.serialize();
-            // System.out.println(queryString);
-
-
-
-            // logger.debug("source selection query:\n" + queryString);
 
             return new ImmutablePair<>(op, patterns);
         } catch (Exception e) {

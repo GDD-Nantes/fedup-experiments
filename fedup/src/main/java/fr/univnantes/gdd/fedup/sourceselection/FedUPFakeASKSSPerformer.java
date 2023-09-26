@@ -16,13 +16,18 @@ import fr.univnantes.gdd.fedup.Spy;
 import fr.univnantes.gdd.fedup.Utils;
 import fr.univnantes.gdd.fedup.strategies.ModuloOnSuffix;
 import fr.univnantes.gdd.fedup.summary.HashSummarizer;
+import fr.univnantes.gdd.fedup.transforms.Graph2TripleVisitor;
 import fr.univnantes.gdd.fedup.transforms.ToSourceSelectionTransforms;
 import org.aksw.simba.quetsal.core.TBSSSourceSelection;
 import org.apache.jena.base.Sys;
 import org.apache.jena.query.*;
 import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.Transformer;
+import org.apache.jena.sparql.algebra.op.OpOrder;
+import org.apache.jena.sparql.algebra.op.OpTriple;
+import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.QueryEngineFactory;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.binding.Binding;
@@ -32,6 +37,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.rdf4j.query.algebra.StatementPattern;
 import org.eclipse.rdf4j.query.impl.EmptyBindingSet;
+import org.eclipse.rdf4j.query.parser.ParsedQuery;
+import org.eclipse.rdf4j.query.parser.sparql.SPARQLParser;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sail.SailRepositoryConnection;
 
@@ -69,12 +76,12 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
     public List<Map<StatementPattern, List<StatementSource>>> performSourceSelection(String queryString, List<Map<String, String>> optimalAssignments, Spy spy) throws Exception {
         Config config = connection.getFederation().getConfig();
 
+        // #1 perform fake ASKs on fedup-id to know where triple patterns are
         Query query = QueryFactory.create(queryString);
         Op op = Algebra.compile(query);
         ToSourceSelectionTransforms tsst = new ToSourceSelectionTransforms(true, endpoints, ds4Asks);
         op = tsst.transform(op);
         // spy.numASKQueries = tsst.getNBASKs TODO if need be
-
 
         // #2 execute the transformed query on the summary
         Integer hashModulo = Integer.parseInt(config.getProperty("fedup.summaryArg"));
@@ -82,17 +89,8 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
         op = Transformer.transform(hs, op);
 
         Dataset dataset = TDB2Factory.connectDataset(config.getProperty("fedup.summary"));
-        // Dataset dataset = TDB2Factory.connectDataset(config.getProperty("fedup.id"));
         dataset.begin(ReadWrite.READ);
-
         QueryEngineTDB.register(); // TODO double check if it reorder or not
-
-        /* Query queryTemp = QueryFactory.create("SELECT * WHERE { GRAPH ?g {?s <http://www.w3.org/2002/07/owl#sameAs> <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/Product171547>}}");
-        Op opTemp = Algebra.compile(queryTemp);
-        QueryIterator iteratorTemp = Algebra.exec(opTemp, dataset);
-        while (iteratorTemp.hasNext()) {
-            System.out.println(iteratorTemp.next().toString());
-        }*/
 
         System.out.println(op);
 
@@ -126,17 +124,34 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
 
 
         // #3 Inject sources into the initial query so it can be executed
-        List<StatementPattern> patterns = Utils.getTriplePatterns(queryString);
-        List<Map<StatementPattern, List<StatementSource>>> fedXAssignments = new ArrayList<>();
+        Graph2TripleVisitor g2tp = new Graph2TripleVisitor();
+        op.visit(g2tp);
 
+        Map<Var, StatementPattern> var2bgp = g2tp.getVar2Triple().entrySet().stream().map(e -> {
+            OpTriple opTriple = new OpTriple(e.getValue());
+            Op opOriginal = hs.getToOriginal().get(opTriple);
+            Query q = OpAsQuery.asQuery(opOriginal);
+            String tripleAsString = q.toString();
+            ParsedQuery parseQuery = new SPARQLParser().parseQuery(tripleAsString, "http://donotcare.com/wathever");
+            StatementPattern bgp = null;
+            try {
+                List<List<StatementPattern>> bgps = Utils.getBasicGraphPatterns(parseQuery);
+                bgp = bgps.get(0).get(0);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+            return Map.entry(e.getKey(), bgp);
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        List<Map<StatementPattern, List<StatementSource>>> fedXAssignments = new ArrayList<>();
         for (Map<String, String> assignment: assignments) {
             Map<StatementPattern, List<StatementSource>> fedXAssignment = new HashMap<>();
-            for (int i = 1; i <= patterns.size(); i++) {
-                String alias = "g"+i;
+            for (int i = 1; i <= var2bgp.size(); i++) {
+                String alias = "g"+i; // TODO change this
                 if (assignment.containsKey(alias)) {
                     Endpoint endpoint = Utils.getEndpointByURL(this.connection.getEndpoints(), assignment.get("g" + i));
                     StatementSource source = new StatementSource(endpoint.getId(), StatementSource.StatementSourceType.REMOTE);
-                    StatementPattern pattern = patterns.get(i - 1);
+                    StatementPattern pattern = var2bgp.get(Var.alloc(alias));
                     fedXAssignment.put(pattern, List.of(source));
                     spy.tpAliases.put(alias, pattern.toString());
                 }

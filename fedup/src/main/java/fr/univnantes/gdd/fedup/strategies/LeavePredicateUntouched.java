@@ -10,19 +10,38 @@ import org.apache.jena.sparql.algebra.op.OpQuad;
 import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.core.Quad;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Abstract class that call the transform of nodes except for the predicate.
  */
 public abstract class LeavePredicateUntouched extends TransformCopy {
 
+    Map<Op, Op> toTransformed = new HashMap<>();
+    Map<Op, Op> toOriginal    = new HashMap<>();
+
     abstract Node transform(Node node);
+
+    public Map<Op, Op> getToOriginal() {
+        return toOriginal;
+    }
+
+    public Map<Op, Op> getToTransformed() {
+        return toTransformed;
+    }
+
+    /* ************************************************************ */
 
     @Override
     public Op transform(OpTriple opTriple) {
         Node subject = this.transform(opTriple.getTriple().getSubject());
         Node predicate = opTriple.getTriple().getPredicate();
         Node object = this.transform(opTriple.getTriple().getObject());
-        return new OpTriple(Triple.create(subject, predicate, object));
+        OpTriple transformed = new OpTriple(Triple.create(subject, predicate, object));
+        toTransformed.put(opTriple, transformed);
+        toOriginal.put(transformed, opTriple);
+        return transformed;
     }
 
     @Override
@@ -31,7 +50,12 @@ public abstract class LeavePredicateUntouched extends TransformCopy {
         Node subject = this.transform(opQuad.getQuad().getSubject());
         Node predicate = opQuad.getQuad().getPredicate();
         Node object = this.transform(opQuad.getQuad().getObject());
-        return new OpQuad(Quad.create(graph, subject, predicate, object));
+        OpQuad transformed = new OpQuad(Quad.create(graph, subject, predicate, object));
+        toTransformed.put(opQuad, transformed);
+        toOriginal.put(transformed, opQuad);
+        // also register as triple
+        this.transform(new OpTriple(opQuad.getQuad().asTriple())); // do nothing of the result
+        return transformed;
     }
 
     @Override
