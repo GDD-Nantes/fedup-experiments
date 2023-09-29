@@ -1,3 +1,10 @@
+**~
+**.zip
+benchmark/
+*.png
+*.log
+*.csv
+
 temp/
 .idea/
 

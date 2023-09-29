@@ -45,7 +45,7 @@ public class Graph2TripleVisitor extends OpVisitorUnimplemented {
 
     @Override
     public void visit(OpFilter opFilter) {
-        opFilter.visit(this);
+        opFilter.getSubOp().visit(this);
     }
 
     @Override

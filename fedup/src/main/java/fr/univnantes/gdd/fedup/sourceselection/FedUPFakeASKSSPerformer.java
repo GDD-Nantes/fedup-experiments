@@ -16,6 +16,7 @@ import fr.univnantes.gdd.fedup.Spy;
 import fr.univnantes.gdd.fedup.Utils;
 import fr.univnantes.gdd.fedup.strategies.ModuloOnSuffix;
 import fr.univnantes.gdd.fedup.summary.HashSummarizer;
+import fr.univnantes.gdd.fedup.summary.RemoveFilterTransformerLol;
 import fr.univnantes.gdd.fedup.transforms.Graph2TripleVisitor;
 import fr.univnantes.gdd.fedup.transforms.ToSourceSelectionTransforms;
 import org.aksw.simba.quetsal.core.TBSSSourceSelection;
@@ -26,7 +27,9 @@ import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.Transformer;
 import org.apache.jena.sparql.algebra.op.OpOrder;
+import org.apache.jena.sparql.algebra.op.OpQuad;
 import org.apache.jena.sparql.algebra.op.OpTriple;
+import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.QueryEngineFactory;
 import org.apache.jena.sparql.engine.QueryIterator;
@@ -87,6 +90,7 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
         Integer hashModulo = Integer.parseInt(config.getProperty("fedup.summaryArg"));
         ModuloOnSuffix hs = new ModuloOnSuffix(hashModulo);
         op = Transformer.transform(hs, op);
+        op = Transformer.transform(new RemoveFilterTransformerLol(), op); // remove filter on summaries
 
         Dataset dataset = TDB2Factory.connectDataset(config.getProperty("fedup.summary"));
         dataset.begin(ReadWrite.READ);
@@ -112,8 +116,8 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
         long endTime = System.currentTimeMillis();
         spy.sourceSelectionTime = (endTime - startTime);
         logger.debug(String.format("Query execution terminated… Took %s ms", spy.sourceSelectionTime));
+        dataset.commit();
         dataset.end();
-        dataset.close();
 
         assignments = this.removeInclusions(assignments);
 
@@ -128,9 +132,11 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
         op.visit(g2tp);
 
         Map<Var, StatementPattern> var2bgp = g2tp.getVar2Triple().entrySet().stream().map(e -> {
-            OpTriple opTriple = new OpTriple(e.getValue());
-            Op opOriginal = hs.getToOriginal().get(opTriple);
-            Query q = OpAsQuery.asQuery(opOriginal);
+            // UGLY AS F
+            OpQuad opQuad = new OpQuad(new Quad(e.getKey(), e.getValue()));
+            OpQuad opOriginal = (OpQuad) hs.getToOriginal().get(opQuad);
+            OpTriple opTriple = new OpTriple(opOriginal.getQuad().asTriple());
+            Query q = OpAsQuery.asQuery(opTriple);
             String tripleAsString = q.toString();
             ParsedQuery parseQuery = new SPARQLParser().parseQuery(tripleAsString, "http://donotcare.com/wathever");
             StatementPattern bgp = null;
@@ -158,7 +164,6 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
             }
             fedXAssignments.add(fedXAssignment);
         }
-
 
         return fedXAssignments;
     }

@@ -165,9 +165,9 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
             }
             fedXAssignments.add(fedXAssignment);
         }
-
+        dataset.commit();
         dataset.end();
-        dataset.close();
+
 
         return fedXAssignments;
     }

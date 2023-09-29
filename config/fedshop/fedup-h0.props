@@ -9,7 +9,6 @@ monitoring.logQueries=false
 sourceSelectionClass=fr.univnantes.gdd.fedup.sourceselection.SourceSelectionInjector
 fedup.sourceSelectionClass=fr.univnantes.gdd.fedup.sourceselection.FedUPFakeASKSSPerformer
 # fedup.sourceSelectionClass=fr.univnantes.gdd.fedup.sourceselection.FedUPSourceSelectionPerformer
-# fedup.summary=/GDD/RSFB/engines/FedUP-experiments/summaries/fedshop/batch4/fedup-h0
 fedup.id=/GDD/RSFB/engines/FedUP-experiments/summaries/fedshop/batch9/fedup-id
 # fedup.id=../summaries/fedshop/batch9/fedup-id
 

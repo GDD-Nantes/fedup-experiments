@@ -39,8 +39,10 @@ public abstract class LeavePredicateUntouched extends TransformCopy {
         Node predicate = opTriple.getTriple().getPredicate();
         Node object = this.transform(opTriple.getTriple().getObject());
         OpTriple transformed = new OpTriple(Triple.create(subject, predicate, object));
-        toTransformed.put(opTriple, transformed);
-        toOriginal.put(transformed, opTriple);
+        // Since we transform a triple into a triple, it will be called again as a noop
+        // register ONLY the first transformation
+        toTransformed.putIfAbsent(opTriple, transformed);
+        toOriginal.putIfAbsent(transformed, opTriple);
         return transformed;
     }
 
@@ -51,10 +53,10 @@ public abstract class LeavePredicateUntouched extends TransformCopy {
         Node predicate = opQuad.getQuad().getPredicate();
         Node object = this.transform(opQuad.getQuad().getObject());
         OpQuad transformed = new OpQuad(Quad.create(graph, subject, predicate, object));
-        toTransformed.put(opQuad, transformed);
-        toOriginal.put(transformed, opQuad);
-        // also register as triple
-        this.transform(new OpTriple(opQuad.getQuad().asTriple())); // do nothing of the result
+        // Since we transform a quad into a quad, it will be called again as a noop
+        // register ONLY the first transformation
+        toTransformed.putIfAbsent(opQuad, transformed);
+        toOriginal.putIfAbsent(transformed, opQuad);
         return transformed;
     }
 

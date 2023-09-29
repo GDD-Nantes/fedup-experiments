@@ -154,6 +154,17 @@ public class ToValuesAndOrderTransform extends TransformUnimplemented {
                 Top2BottomTransformer.transform(rightTransform, opUnion.getRight()));
     }
 
+    @Override
+    public Op transform(OpJoin opJoin, Op left, Op right) {
+        ToValuesAndOrderTransform rightTransform = new ToValuesAndOrderTransform(this, this.tracker);
+        rightTransform.tracker.addAll(OpVars.visibleVars(opJoin.getLeft()));
+
+        // We get the variable set on the left side and inform right side
+        return OpJoin.create(Top2BottomTransformer.transform(this, opJoin.getLeft()),
+                Top2BottomTransformer.transform(rightTransform, opJoin.getRight()));
+    }
+
+
     /* ********************************************************************* */
 
     /**

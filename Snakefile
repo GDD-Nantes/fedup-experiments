@@ -251,8 +251,8 @@ rule fedup_random_walks_efficiency:
         if reason is None:
             with open(str(input.query)) as reader:
                 query = reader.read()
-            optimalAssignments = pandas.read_csv(str(input.optimal))["assignments"].values[0]
-            print(optimalAssignments)
+            # optimalAssignments = pandas.read_csv(str(input.optimal))["assignments"].values[0]
+            # print(optimalAssignments)
             # optimalAssignments = optimalAssignments.replace("\'", "\"")
             # optimalAssignments = json.loads(optimalAssignments)
             result = run({
