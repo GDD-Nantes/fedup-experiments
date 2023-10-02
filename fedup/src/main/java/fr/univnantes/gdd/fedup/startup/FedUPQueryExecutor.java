@@ -76,7 +76,7 @@ public class FedUPQueryExecutor {
     private class ResultsManager {
 
         private int remainingProducers;
-        private long limit = Integer.MAX_VALUE;
+        private long limit = Long.MAX_VALUE;
         private MultiSet<BindingSet> bindings = new HashMultiSet<>();
 
         HasOptionalVisitor hasOptional = new HasOptionalVisitor();
@@ -84,15 +84,32 @@ public class FedUPQueryExecutor {
         Query query;
         Op op;
 
+        // number of solutions that have their OPTIONAL part complete, ie,
+        // bindings match the OPTIONAL part. Instead of waiting for every results
+        // it can directly trigger the LIMIT reached.
+        Integer completeSolutions = 0;
+        long limitOptionalOrOrderBy = Long.MAX_VALUE;
+        ActualVarsVisitor actualVars = new ActualVarsVisitor();
+        List<Var> projectedVars;
+
         public ResultsManager(int numProducers, Query query) {
             this.query = query;
             op = Algebra.compile(query);
             op.visit(hasOptional);
 
+            // remove projected that are useless
+            // important to make sure result bindings arrive complete
+            projectedVars = new ArrayList<>(query.getProjectVars());
+            op.visit(actualVars);
+            if (Objects.nonNull(actualVars.vars)) {
+                projectedVars.retainAll(actualVars.vars);
+            }
+
             if (query.hasLimit()) {
                 // because post-process is need to remove
                 // included bindings and/or reorder merged results
-                limit = (query.hasOrderBy() || hasOptional.result) ? Integer.MAX_VALUE : query.getLimit();
+                limit = (query.hasOrderBy() || hasOptional.result) ? Long.MAX_VALUE : query.getLimit();
+                limitOptionalOrOrderBy = (query.hasOrderBy() || hasOptional.result) ? query.getLimit() : Long.MAX_VALUE;
             }
             if (query.hasOrderBy()) {
                 op.visit(hasOrderBy);
@@ -102,7 +119,9 @@ public class FedUPQueryExecutor {
         }
 
         public synchronized void waitForResults() {
-            while (this.size() < this.limit && this.remainingProducers > 0) {
+            while (this.size() < this.limit &&
+                    this.completeSolutions < this.limitOptionalOrOrderBy &&
+                    this.remainingProducers > 0) {
                 try {
                     wait();
                 } catch (InterruptedException e) { }
@@ -115,6 +134,16 @@ public class FedUPQueryExecutor {
         }
 
         public synchronized boolean addSolution(BindingSet solution) {
+
+            if (hasAllVarsSet(projectedVars, solution)) {
+                if (query.isDistinct()) {
+                    if (!this.bindings.contains(solution)) {
+                        completeSolutions += 1;
+                    }
+                } else {
+                    completeSolutions += 1;
+                }
+            }
             if (hasOptional.result) {
                 // normally, it would require a clever solution based on
                 // the query plan to determine the optional variables and
@@ -125,7 +154,7 @@ public class FedUPQueryExecutor {
                 this.bindings.add(solution);
             }
             notifyAll();
-            return this.size() >= this.limit;
+            return this.size() >= this.limit || this.completeSolutions >= this.limitOptionalOrOrderBy ;
         }
 
         public synchronized void notifyComplete() {
@@ -198,6 +227,10 @@ public class FedUPQueryExecutor {
                 }
             }
             return true;
+        }
+
+        public static boolean hasAllVarsSet(List<Var> projected, BindingSet bindings) {
+            return projected.stream().allMatch(p -> bindings.hasBinding(p.getName()));
         }
 
     }
