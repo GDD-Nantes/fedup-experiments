@@ -44,14 +44,20 @@ public class FedUPQueryExecutor {
         try {
             for (int i = 0; i < numSubQueries; i++) {
                 Future<?> future = executor.submit(() -> {
-                    TupleQuery q = this.connection.prepareTupleQuery(queryString);
-                    TupleQueryResult results = q.evaluate();
-                    while (results.hasNext()) {
-                        if (resultsManager.addSolution(results.next())) {
-                            break;
+                    try {
+                        TupleQuery q = this.connection.prepareTupleQuery(queryString);
+                        TupleQueryResult results = q.evaluate();
+                        while (results.hasNext()) {
+                            if (resultsManager.addSolution(results.next())) {
+                                break;
+                            }
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        // then notify complete
+                    } finally {
+                        resultsManager.notifyComplete();
                     }
-                    resultsManager.notifyComplete();
                 });
                 futures.add(future);
             }
@@ -62,7 +68,7 @@ public class FedUPQueryExecutor {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            executor.shutdown();
+            executor.shutdownNow();
         }
         long endTime = System.currentTimeMillis();
         
@@ -92,7 +98,7 @@ public class FedUPQueryExecutor {
         ActualVarsVisitor actualVars = new ActualVarsVisitor();
         List<Var> projectedVars;
 
-        public ResultsManager(int numProducers, Query query) {
+        public ResultsManager(Integer remainingProducers, Query query) {
             this.query = query;
             op = Algebra.compile(query);
             op.visit(hasOptional);
@@ -115,7 +121,11 @@ public class FedUPQueryExecutor {
                 op.visit(hasOrderBy);
             }
 
-            this.remainingProducers = numProducers;
+            this.remainingProducers = remainingProducers;
+        }
+
+        public void addProducer() {
+            this.remainingProducers += 1;
         }
 
         public synchronized void waitForResults() {

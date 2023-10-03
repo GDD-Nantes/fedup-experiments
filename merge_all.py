@@ -13,6 +13,7 @@ projected_columns = [
     "sourceSelectionTime", "executionTime", "numASKQueries", "tpwss", "numAssignments", "numSolutions"]
 for file in files:
     try:
+        print (f"Reading file {file}")
         df = pandas.read_csv(file)
         dataframes.append(df[projected_columns])
     except Exception as error:

@@ -244,7 +244,7 @@ rule fedup_random_walks_efficiency:
         query = "queries/{workload}/{query}.sparql",
         config = "config/{workload}/{approach}.props",
         endpoints = "config/{workload}/endpoints.txt",
-        optimal = "{xpdir}/{workload}/fedup-id-optimal/{query}.1.csv"
+        # optimal = "{xpdir}/{workload}/fedup-id-optimal/{query}.1.csv"
     output: "{xpdir}/{workload}/{approach,fedup(-id|-h0|-h10|-h100)}/{query}.{run}.csv"
     run:
         reason = is_blacklist(wildcards)

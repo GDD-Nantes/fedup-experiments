@@ -1,5 +1,7 @@
 package fr.univnantes.gdd.fedup.asks;
 
+import com.fluidops.fedx.Config;
+import org.aksw.simba.quetsal.configuration.QuetzalConfig;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Dataset;
