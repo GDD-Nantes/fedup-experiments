@@ -17,6 +17,7 @@ import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.repository.sail.SailRepositoryConnection;
 
 import java.util.*;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -62,9 +63,7 @@ public class FedUPQueryExecutor {
                 futures.add(future);
             }
             resultsManager.waitForResults();
-            for (Future<?> future: futures) {
-                future.cancel(true);
-            }
+            futures.forEach(f -> f.cancel(true));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
