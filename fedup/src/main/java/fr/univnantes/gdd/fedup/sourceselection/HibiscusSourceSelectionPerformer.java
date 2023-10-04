@@ -23,7 +23,7 @@ import fr.univnantes.gdd.fedup.Utils;
 
 public class HibiscusSourceSelectionPerformer extends SourceSelectionPerformer {
 
-    private static Logger logger = LogManager.getLogger(HibiscusSourceSelectionPerformer.class);
+    private static final Logger logger = LogManager.getLogger(HibiscusSourceSelectionPerformer.class);
 
     public HibiscusSourceSelectionPerformer(SailRepositoryConnection connection) {
         super(connection);
@@ -46,13 +46,14 @@ public class HibiscusSourceSelectionPerformer extends SourceSelectionPerformer {
         long endTime = System.currentTimeMillis();
 
         spy.sourceSelectionTime = endTime - startTime;
+        spy.planType = "JoU";
 
         return List.of(sourceSelection.getStmtToSources());
     }
 
-    private class SourceSelection extends HibiscusSourceSelection {
+    private static class SourceSelection extends HibiscusSourceSelection {
 
-        private Spy spy;
+        private final Spy spy;
 
         public SourceSelection(List<Endpoint> endpoints, Cache cache, QueryInfo queryInfo, Spy spy) {
             super(endpoints, cache, queryInfo);

@@ -23,7 +23,7 @@ import fr.univnantes.gdd.fedup.Utils;
 
 public class CostFedSourceSelectionPerformer extends SourceSelectionPerformer {
 
-    private static Logger logger = LogManager.getLogger(CostFedSourceSelectionPerformer.class);
+    private static final Logger logger = LogManager.getLogger(CostFedSourceSelectionPerformer.class);
 
     public CostFedSourceSelectionPerformer(SailRepositoryConnection connection) {
         super(connection);
@@ -46,13 +46,14 @@ public class CostFedSourceSelectionPerformer extends SourceSelectionPerformer {
         long endTime = System.currentTimeMillis();
 
         spy.sourceSelectionTime = endTime - startTime;
+        spy.planType = "JoU";
         
         return List.of(sourceSelection.getStmtToSources());
     }
  
-    private class SourceSelection extends TBSSSourceSelection {
+    private static class SourceSelection extends TBSSSourceSelection {
 
-        private Spy spy;
+        private final Spy spy;
 
         public SourceSelection(List<Endpoint> endpoints, Cache cache, QueryInfo queryInfo, Spy spy) {
             super(endpoints, cache, queryInfo);

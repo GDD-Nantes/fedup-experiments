@@ -5,7 +5,7 @@ import json
 
 dataframes = []
 try:
-    df = pandas.read_csv("./output/fedshop/fedup-id-optimal/q07i.1.csv")
+    df = pandas.read_csv("./test/fedshop/fedup-h0/q04h.1.csv")
     dataframes.append(df["solutions"])
 except Exception as error:
     print(f"error in file {file}: {error}")

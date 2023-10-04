@@ -3,11 +3,12 @@ package fr.univnantes.gdd.fedup.transforms;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.TransformCopy;
-import org.apache.jena.sparql.algebra.TransformSingle;
 import org.apache.jena.sparql.algebra.op.*;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.core.VarExprList;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,37 +22,37 @@ public class ToQuadsTransform extends TransformCopy {
     public final boolean asSequence = false; // join quads with opSequence or opJoin
 
     Integer nbGraphs = 0;
-    Map<Var, Triple> var2Triple = new HashMap<>();
-    Map<Triple, Var> triple2Var = new HashMap<>();
+    Map<Var, Quad> var2quad = new HashMap<>();
+    Map<Quad, Var> quad2var = new HashMap<>();
 
     public ToQuadsTransform() {}
 
     /**
      * Link variable and triple both ways in maps.
      * @param var The variable associated to the triple.
-     * @param triple The triple associated to the variable.
+     * @param quad The quad associated to the variable.
      */
-    private void add(Var var, Triple triple) {
-        var2Triple.put(var, triple);
-        triple2Var.put(triple, var);
+    private void add(Var var, Quad quad) {
+        var2quad.put(var, quad);
+        quad2var.put(quad, var);
     }
 
     /**
      * @return The set of new vars dedicated to graph selection and their associated triple.
      */
-    public Map<Var, Triple> getVar2Triple() { return var2Triple; }
+    public Map<Var, Quad> getVar2quad() { return var2quad; }
 
     /**
      * @return The var associated to the triple.
      */
-    public Map<Triple, Var> getTriple2Var() { return triple2Var; }
+    public Map<Quad, Var> getQuad2var() { return quad2var; }
 
     @Override
     public Op transform(OpTriple opTriple) {
         nbGraphs += 1;
         Var g = Var.alloc("g" + nbGraphs);
-        this.add(g, opTriple.getTriple());
         Quad quad = new Quad(g, opTriple.getTriple());
+        this.add(g, quad);
         return new OpQuad(quad);
     }
 
@@ -60,23 +61,9 @@ public class ToQuadsTransform extends TransformCopy {
         List<Op> quads = opBGP.getPattern().getList().stream().map(triple ->
             this.transform(new OpTriple(triple))
         ).toList();
-
-        if (quads.size() == 1) {
-            return quads.get(0);
-        } else { // >= 2
-            if (asSequence) {
-                OpSequence sequence = OpSequence.create();
-                quads.forEach(sequence::add);
-                return sequence;
-            } else {
-                Op left = quads.get(0);
-                for (int i = 1; i < quads.size(); ++i) {
-                    Op right = quads.get(i);
-                    left = OpJoin.create(left, right);
-                }
-                return left;
-            }
-        }
+        OpSequence sequence = OpSequence.create();
+        quads.forEach(sequence::add);
+        return sequence;
     }
 
 }

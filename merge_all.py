@@ -4,8 +4,8 @@ from pygnuplot import gnuplot
 
 output = "./data.csv"
 
-# files = glob.glob('./output/largerdfbench/*/*.csv', recursive=True)
-files = glob.glob('./output/fedshop/*/*.csv', recursive=True)
+# files = glob.glob('./test/largerdfbench/*/*.csv', recursive=True)
+files = glob.glob('./test/fedshop/*/*.csv', recursive=True)
 
 dataframes = []
 projected_columns = [

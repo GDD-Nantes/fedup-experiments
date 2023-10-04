@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import fr.univnantes.gdd.fedup.sourceselection.FedUPSourceSelectionPerformer;
+import com.fluidops.fedx.*;
+import fr.univnantes.gdd.fedup.sourceselection.UoJvsJoU;
 import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
@@ -31,9 +31,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fluidops.fedx.Config;
-import com.fluidops.fedx.FedXFactory;
-import com.fluidops.fedx.Util;
 import com.fluidops.fedx.algebra.StatementSource;
 import com.fluidops.fedx.sail.FedXSailRepository;
 
@@ -42,7 +39,6 @@ import fr.gdd.sage.arq.QueryEngineSage;
 import fr.gdd.sage.arq.SageConstants;
 import fr.univnantes.gdd.fedup.Spy;
 import fr.univnantes.gdd.fedup.Utils;
-import fr.univnantes.gdd.fedup.sourceselection.SourceAssignments;
 import fr.univnantes.gdd.fedup.sourceselection.SourceSelectionPerformer;
 
 @RestController
@@ -80,14 +76,18 @@ public class FedUPController {
 		List<Map<StatementPattern, List<StatementSource>>> assignments;
 		assignments = sourceSelectionPerformer.performSourceSelection(parameters.queryString, parameters.assignments, spy);
 
+		// assignments = List.of(assignments.getLast());
+
+		// new PrintQueryPlans((FedXConnection) connection.getSailConnection()).print(parameters.queryString, assignments);
+
 		spy.tpwss = Utils.computeTPWSS(assignments);
 
 		// logger.debug("Assignments: " + assignments);
 
 		// global assign so FedX can pick its source assignments one by one afterward
-		SourceAssignments sourceSelection = SourceAssignments.getInstance();
-		Collections.shuffle(assignments);
-		sourceSelection.setAssignments(assignments);
+		// SourceAssignments sourceSelection = SourceAssignments.getInstance();
+		// Collections.shuffle(assignments);
+		// sourceSelection.setAssignments(assignments);
 
 		// (TODO) RDF4J does not support values
 		// (TODO) ugly testing by quickly removing the values
@@ -96,7 +96,7 @@ public class FedUPController {
 		System.out.println(queryString);
 		if (parameters.runQuery) {
 			FedUPQueryExecutor executor = new FedUPQueryExecutor(connection);
-			executor.execute(queryString, sourceSelection, spy);
+			executor.execute(queryString, assignments, spy);
 		}
 
 		logger.info("Source Selection Time: " + spy.sourceSelectionTime + "ms");

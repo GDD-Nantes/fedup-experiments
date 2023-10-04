@@ -1,5 +1,6 @@
 package fr.univnantes.gdd.fedup;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,10 +15,9 @@ public class Spy {
     public int numASKQueries = 0;
     public int numSolutions = 0;
     public int numAssignments = 0;
-    public int numFoundAssignments = 0;
-    public int numValidAssignments = 0;
     public long tpwss = 0;
     public List<Map<String, String>> assignments = null;
     public Map<String, String> tpAliases = new HashMap<>();
-    public List<String> solutions = null;
+    public List<String> solutions = new ArrayList<>();
+    public String planType = "UoJ";
 }

@@ -8,18 +8,18 @@ import org.eclipse.rdf4j.query.algebra.StatementPattern;
 
 import com.fluidops.fedx.algebra.StatementSource;
 
-public class SourceAssignments {
+public class SourceAssignmentsSingleton {
     
-    private static SourceAssignments instance = null;
+    private static SourceAssignmentsSingleton instance = null;
 
     private List<Map<StatementPattern, List<StatementSource>>> assignments = new ArrayList<>();
     private int index = 0;
 
-    private SourceAssignments() { }
+    private SourceAssignmentsSingleton() { }
 
-    public static SourceAssignments getInstance() {
+    public static SourceAssignmentsSingleton getInstance() {
         if (instance == null) {
-            instance = new SourceAssignments();
+            instance = new SourceAssignmentsSingleton();
         }
         return instance;
     }

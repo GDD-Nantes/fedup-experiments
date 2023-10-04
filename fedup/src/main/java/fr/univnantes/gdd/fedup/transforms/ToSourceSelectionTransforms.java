@@ -1,7 +1,9 @@
 package fr.univnantes.gdd.fedup.transforms;
 
+import fr.univnantes.gdd.fedup.strategies.ModuloOnSuffix;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.Transform;
 import org.apache.jena.sparql.algebra.Transformer;
 import org.apache.jena.sparql.algebra.op.OpDistinct;
 import org.apache.jena.sparql.algebra.op.OpProject;
@@ -16,12 +18,14 @@ import java.util.Set;
  */
 public class ToSourceSelectionTransforms {
 
+    Transform summarizer;
     Set<String> endpoints;
     Dataset dataset;
 
     public boolean asDistinctGraphs;
 
-    public ToSourceSelectionTransforms(boolean asDistinctGraph, Set<String> endpoints, Dataset... datasets) { // default
+    public ToSourceSelectionTransforms(Transform summarizer, boolean asDistinctGraph, Set<String> endpoints, Dataset... datasets) { // default
+        this.summarizer = summarizer;
         this.asDistinctGraphs = asDistinctGraph;
         this.endpoints = endpoints;
         this.dataset = (Objects.nonNull(datasets) && datasets.length > 0) ? datasets[0] : null;
@@ -34,26 +38,32 @@ public class ToSourceSelectionTransforms {
         }
 
         ToQuadsTransform tq = new ToQuadsTransform();
-        ToValuesWithoutPlaceholderTransform tvwpt = new ToValuesWithoutPlaceholderTransform(tq, tv);
+        // ToValuesWithoutPlaceholderTransform tvwpt = new ToValuesWithoutPlaceholderTransform(tq, tv);
 
         // #1 remove noisy operators
         op = Transformer.transform(new ToRemoveNoiseTransformer(), op);
-        // #2 add VALUES and order triple patterns
-        Op opValues = tv.transform(op);
         // #3 add graph clauses to triple patterns
-        Op opQuads = Transformer.transform(tq, opValues);
-        // #4 force back graph clauses in the corresponding VALUES when need be
-        Op opQuadsAndValuesWithoutPlaceholders = Transformer.transform(tvwpt, opQuads);
+        op = Transformer.transform(tq, op);
+        // #2 add VALUES and order triple patterns
+        op = tv.transform(op);
 
-        opQuadsAndValuesWithoutPlaceholders = Transformer.transform(new AddFilterForAskedGraphs(tv), opQuadsAndValuesWithoutPlaceholders);
+        AddFilterForAskedGraphs affag = new AddFilterForAskedGraphs(tv);
+
+        if (summarizer instanceof ModuloOnSuffix) {
+            ((ModuloOnSuffix) summarizer).setAffag(affag);
+        }
+
+        op = Transformer.transform(affag, op);
+
+        op = Transformer.transform(summarizer, op);
 
         // #5 wraps it in a projection distinct graphs
         if (asDistinctGraphs) {
-            List<Var> graphs = tq.var2Triple.keySet().stream().toList();
-            OpProject opProject = new OpProject(opQuadsAndValuesWithoutPlaceholders, graphs);
+            List<Var> graphs = tq.var2quad.keySet().stream().toList();
+            OpProject opProject = new OpProject(op, graphs);
             return new OpDistinct(opProject);
         } else {
-            return opQuadsAndValuesWithoutPlaceholders;
+            return op;
         }
     }
 

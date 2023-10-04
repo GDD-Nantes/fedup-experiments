@@ -201,7 +201,8 @@ rule merge_all:
         dataframes = []
         projected_columns = [
             "query", "approach", "run", "workload",
-            "sourceSelectionTime", "executionTime", "numASKQueries", "tpwss"]
+            "sourceSelectionTime", "executionTime",
+            "numASKQueries", "tpwss", "numAssignments", "numSolutions", "planType"]
         for file in input:
             try:
                 df = pandas.read_csv(file)

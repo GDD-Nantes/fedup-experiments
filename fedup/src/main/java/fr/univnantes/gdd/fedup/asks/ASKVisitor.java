@@ -100,4 +100,9 @@ public class ASKVisitor extends OpVisitorUnimplemented {
     public void visit(OpFilter opFilter) {
         opFilter.getSubOp().visit(this);
     }
+
+    @Override
+    public void visit(OpSequence opSequence) {
+        opSequence.getElements().forEach(op -> op.visit(this));
+    }
 }

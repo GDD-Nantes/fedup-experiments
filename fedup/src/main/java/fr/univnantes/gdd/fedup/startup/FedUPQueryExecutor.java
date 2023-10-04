@@ -1,7 +1,8 @@
 package fr.univnantes.gdd.fedup.startup;
 
+import com.fluidops.fedx.algebra.StatementSource;
 import fr.univnantes.gdd.fedup.Spy;
-import fr.univnantes.gdd.fedup.sourceselection.SourceAssignments;
+import fr.univnantes.gdd.fedup.sourceselection.SourceAssignmentsSingleton;
 import org.apache.commons.collections4.MultiSet;
 import org.apache.commons.collections4.multiset.HashMultiSet;
 import org.apache.jena.query.Query;
@@ -10,14 +11,11 @@ import org.apache.jena.query.SortCondition;
 import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.core.Var;
-import org.eclipse.rdf4j.query.Binding;
-import org.eclipse.rdf4j.query.BindingSet;
-import org.eclipse.rdf4j.query.TupleQuery;
-import org.eclipse.rdf4j.query.TupleQueryResult;
+import org.eclipse.rdf4j.query.*;
+import org.eclipse.rdf4j.query.algebra.StatementPattern;
 import org.eclipse.rdf4j.repository.sail.SailRepositoryConnection;
 
 import java.util.*;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -25,16 +23,20 @@ import java.util.stream.Stream;
 
 public class FedUPQueryExecutor {
     
-    private SailRepositoryConnection connection; // is connection thread safe??
+    private final SailRepositoryConnection connection; // is connection thread safe??
 
     public FedUPQueryExecutor(SailRepositoryConnection connection) {
         this.connection = connection;
     }
 
-    public void execute(String queryString, SourceAssignments assignments, Spy spy) throws Exception {
-        int numSubQueries = assignments.getAssignments().size();
+    public void execute(String queryString, List<Map<StatementPattern, List<StatementSource>>> assignments, Spy spy) throws Exception {
+        SourceAssignmentsSingleton.getInstance().setAssignments(assignments);
 
-        ExecutorService executor = Executors.newFixedThreadPool(Math.max(Math.min(numSubQueries, 8), 1));
+        int numSubQueries = assignments.size();
+
+        // ExecutorService executor = Executors.newFixedThreadPool(Math.max(Math.min(numSubQueries, 8), 1));
+
+        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor(); // since java21 masterclass
 
         Query query = QueryFactory.create(queryString);
 
@@ -54,8 +56,9 @@ public class FedUPQueryExecutor {
                             }
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        // then notify complete
+                        if (!(e.getMessage().contains("interrupt"))) { // if not cancel by the executor
+                            e.printStackTrace();
+                        }
                     } finally {
                         resultsManager.notifyComplete();
                     }
@@ -143,7 +146,9 @@ public class FedUPQueryExecutor {
         }
 
         public synchronized boolean addSolution(BindingSet solution) {
-
+            if (this.size() >= this.limit || this.completeSolutions >= this.limitOptionalOrOrderBy) { // to avoid threads from adding new results before cancel when the limit is reached
+                return true;
+            }
             if (hasAllVarsSet(projectedVars, solution)) {
                 if (query.isDistinct()) {
                     if (!this.bindings.contains(solution)) {

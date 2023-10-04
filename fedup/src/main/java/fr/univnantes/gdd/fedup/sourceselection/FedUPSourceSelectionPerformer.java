@@ -11,6 +11,7 @@ import fr.gdd.raw.io.RAWInput;
 import fr.univnantes.gdd.fedup.Spy;
 import fr.univnantes.gdd.fedup.ToSourceSelectionQueryTransform;
 import fr.univnantes.gdd.fedup.Utils;
+import fr.univnantes.gdd.fedup.strategies.Identity;
 import fr.univnantes.gdd.fedup.summary.Summarizer;
 import fr.univnantes.gdd.fedup.transforms.Graph2TripleVisitor;
 import fr.univnantes.gdd.fedup.transforms.ToSourceSelectionTransforms;
@@ -35,6 +36,7 @@ import org.apache.jena.tdb2.TDB2Factory;
 import org.apache.jena.tdb2.solver.QueryEngineTDB;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.zookeeper.data.Id;
 import org.eclipse.rdf4j.RDF4JException;
 import org.eclipse.rdf4j.query.algebra.LeftJoin;
 import org.eclipse.rdf4j.query.algebra.StatementPattern;
@@ -59,9 +61,7 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         super(connection);
 
         // #1 transform the query to get fake ASKs
-        endpoints = this.connection.getEndpoints().stream().map(e ->
-                e.getEndpoint().substring(e.getEndpoint().indexOf("default-graph-uri=") + 18,
-                        e.getEndpoint().length())).collect(Collectors.toSet()); // get graph names from endpoints
+        endpoints = this.connection.getEndpoints().stream().map(e -> e.getEndpoint().substring(e.getEndpoint().indexOf("default-graph-uri=") + 18)).collect(Collectors.toSet()); // get graph names from endpoints
         ds4Asks = TDB2Factory.connectDataset(this.connection.getFederation().getConfig().getProperty("fedup.summary"));
     }
 
@@ -76,20 +76,10 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         Dataset dataset = TDB2Factory.connectDataset(config.getProperty("fedup.summary"));
         dataset.begin(TxnType.READ);
 
-        QueryEngineFactory factory;
-        if (false) { // TODO never random walking
-        // if (Boolean.parseBoolean(config.getProperty("fedup.random", "false"))) {
-            QueryEngineRAW.register();
-            QueryEngineTDB.unregister();
-            factory = QueryEngineRAW.factory;
-        } else {
-            QueryEngineRAW.unregister();
-            QueryEngineTDB.register();
-            factory = QueryEngineTDB.getFactory();
-        }
+        QueryEngineTDB.register();
+        QueryEngineFactory factory = QueryEngineTDB.getFactory();
 
         var sourceSelectionQuery = this.createSourceSelectionQuery(queryString);
-
 
         logger.debug("Executing query...");
         long startTime = System.currentTimeMillis();
@@ -109,13 +99,9 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         while (iterator.hasNext()) {
             Binding binding = iterator.next();
             int hashcode = binding.toString().hashCode();
-            // logger.debug("Binding #" +  Integer.toString(hashcode));
             if (!seen.contains(hashcode)) {
                 seen.add(hashcode);
                 assignments.add(this.bindingToMap(binding));
-                if (optimalAssignments.size() > 0 && this.countMissingAssignments(assignments, optimalAssignments) == 0) {
-                    break;
-                }
             }
         }
         long endTime = System.currentTimeMillis();
@@ -123,12 +109,10 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
 
         spy.sourceSelectionTime = (endTime - startTime);
 
-        assignments = this.removeInclusions(assignments);
+        assignments = removeInclusions(assignments);
 
         spy.assignments = assignments;
         spy.numAssignments = assignments.size();
-        spy.numValidAssignments = optimalAssignments.size();
-        spy.numFoundAssignments = optimalAssignments.size() - this.countMissingAssignments(assignments, optimalAssignments);
 
         List<Map<StatementPattern, List<StatementSource>>> fedXAssignments = new ArrayList<>();
 
@@ -168,27 +152,8 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         dataset.commit();
         dataset.end();
 
-
         return fedXAssignments;
-    }
-
-    static int countMissingAssignments(List<Map<String, String>> sourceSelection, List<Map<String, String>> optimalSourceSelection) {
-        int missingAssignments = 0;
-        for (Map<String, String> binding: optimalSourceSelection) {
-            boolean found = false;
-            for (Map<String, String> otherBinding: sourceSelection) {
-                if (otherBinding.entrySet().containsAll(binding.entrySet())) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                missingAssignments += 1;
-                // return false;
-            }
-        }
-        // return true;
-        return missingAssignments;
+        // return new UoJvsJoU(this.connection).selectBestAssignment(queryString, fedXAssignments, spy);
     }
 
     protected Map<String, String> bindingToMap(Binding binding) {
@@ -226,147 +191,27 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
     }
 
     protected ImmutablePair<Op, List<StatementPattern>> createSourceSelectionQuery(String queryString) throws Exception {
-        try {
-            // queryString = new TriplePatternsReorderer().optimize(queryString);
-            Query query = QueryFactory.create(queryString);
-            Op op = Algebra.compile(query);
-            ToSourceSelectionTransforms tsst = new ToSourceSelectionTransforms(true, endpoints, ds4Asks);
-            op = tsst.transform(op);
+        Identity id = new Identity();
 
-            List<StatementPattern> patterns = Utils.getTriplePatterns(queryString);
+        Query query = QueryFactory.create(queryString);
+        Op op = Algebra.compile(query);
+        ToSourceSelectionTransforms tsst = new ToSourceSelectionTransforms(id, true, endpoints, ds4Asks);
+        op = tsst.transform(op);
 
-            Config config = this.connection.getFederation().getConfig();
+        List<StatementPattern> patterns = Utils.getTriplePatterns(queryString);
 
-            Summarizer summarizer = (Summarizer) Util.instantiate(
-                    config.getProperty("fedup.summaryClass"),
-                    Integer.parseInt(config.getProperty("fedup.summaryArg", "0")));
+        Config config = this.connection.getFederation().getConfig();
 
-            // summarizer before toSourceSelectionQuery Transform since it only works on triples
-            op = summarizer.summarize(op);
-            // op = Transformer.transform(new ToSourceSelectionQueryTransform(), op);
+        Summarizer summarizer = (Summarizer) Util.instantiate(
+                config.getProperty("fedup.summaryClass"),
+                Integer.parseInt(config.getProperty("fedup.summaryArg", "0")));
 
-            System.out.println(op.toString());
+        // summarizer before toSourceSelectionQuery Transform since it only works on triples
+        op = summarizer.summarize(op);
+        // op = Transformer.transform(new ToSourceSelectionQueryTransform(), op);
 
+        System.out.println(op.toString());
 
-            return new ImmutablePair<>(op, patterns);
-        } catch (Exception e) {
-            throw e;
-            // throw new Exception("Error when rewriting the query", e.getCause());
-        }
-    }
-
-    private class TriplePatternsReorderer extends AbstractQueryModelVisitor<Exception> {
-
-        private class StatementPatternWithScore {
-            
-            private StatementPattern pattern;
-
-            public StatementPatternWithScore(StatementPattern pattern) {
-                this.pattern = pattern;
-            }
-
-            public StatementPattern getPattern() {
-                return this.pattern;
-            }
-
-            public int getScore() {
-                int score = 0;
-                if (this.pattern.getSubjectVar().isConstant()) {
-                    score += 4;
-                }
-                if (this.pattern.getPredicateVar().isConstant() && !this.pattern.getPredicateVar().getValue().toString().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
-                    score += 1;
-                }
-                if (this.pattern.getObjectVar().isConstant()) {
-                    score += 2;
-                }
-                return score;
-            }
-        }
-
-        private List<StatementPattern> currentBGP = new ArrayList<>();
-        private List<String> currentVars = new ArrayList<>();
-
-        private String optimize(String queryString) throws Exception {
-            try {
-                ParsedQuery parseQuery = new SPARQLParser().parseQuery(queryString, "http://donotcare.com/wathever");
-                this.meetNode(parseQuery.getTupleExpr());
-                this.reorderBGP();
-                return new SPARQLQueryRenderer().render(parseQuery);
-            } catch (RDF4JException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        private boolean isConnected(StatementPattern pattern) {
-            return pattern.getVarList().stream().anyMatch(var -> {
-                return this.currentVars.contains(var.getName());
-            });
-        }
-
-        private void updateVars(StatementPattern pattern) {
-            List<String> vars = pattern.getVarList().stream().filter(var -> {
-                return !var.isConstant();
-            }).map(var -> {
-                return var.getName();
-            }).collect(Collectors.toList());
-            this.currentVars.addAll(vars);
-        }
-                
-        private void reorderBGP() throws Exception {
-            List<StatementPatternWithScore> scoredTriples = this.currentBGP.stream().map(triple -> {
-                return new StatementPatternWithScore(triple);
-            }).collect(Collectors.toList());
-            
-            scoredTriples = scoredTriples.stream().sorted((a, b) -> {
-                return b.getScore() - a.getScore();
-            }).collect(Collectors.toList());
-                        
-            List<StatementPattern> orderedTriples = new ArrayList<>();
-            while (scoredTriples.size() > 0) {
-                boolean cartesianProduct = true;
-                for (int i = 0; i < scoredTriples.size(); i++) {
-                    if (this.isConnected(scoredTriples.get(i).getPattern())) {
-                        this.updateVars(scoredTriples.get(i).getPattern());
-                        orderedTriples.add(scoredTriples.remove(i).getPattern());
-                        cartesianProduct = false;
-                        break;
-                    }
-                }
-                if (cartesianProduct) {
-                    this.updateVars(scoredTriples.get(0).getPattern());
-                    orderedTriples.add(scoredTriples.remove(0).getPattern());
-                }
-            }
-
-            for (int i = 0; i < this.currentBGP.size(); i++) {
-                this.currentBGP.get(i).replaceWith(orderedTriples.get(i).clone());
-            }
-
-            this.currentBGP = new ArrayList<>();
-        }
-
-        @Override
-        public void meet(Union node) throws Exception {
-            node.getLeftArg().visit(this);
-            this.reorderBGP();
-            this.currentVars = new ArrayList<>();
-            node.getRightArg().visit(this);
-            this.reorderBGP();
-        }
-
-        @Override
-        public void meet(LeftJoin node) throws Exception {
-            node.getLeftArg().visit(this);
-            this.reorderBGP();
-            node.getRightArg().visit(this);
-            this.reorderBGP();
-        }
-
-        @Override
-        public void meet(StatementPattern node) throws Exception {
-            this.currentBGP.add(node);
-        }
+        return new ImmutablePair<>(op, patterns);
     }
 }

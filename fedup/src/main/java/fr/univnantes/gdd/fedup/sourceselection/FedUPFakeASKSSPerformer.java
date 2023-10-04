@@ -69,9 +69,7 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
         this.sailRepositoryConnection = connection;
 
         // #1 transform the query to get fake ASKs
-        endpoints = this.connection.getEndpoints().stream().map(e ->
-                e.getEndpoint().substring(e.getEndpoint().indexOf("default-graph-uri=") + 18,
-                        e.getEndpoint().length())).collect(Collectors.toSet()); // get graph names from endpoints
+        endpoints = this.connection.getEndpoints().stream().map(e -> e.getEndpoint().substring(e.getEndpoint().indexOf("default-graph-uri=") + 18)).collect(Collectors.toSet()); // get graph names from endpoints
         ds4Asks = TDB2Factory.connectDataset(this.connection.getFederation().getConfig().getProperty("fedup.id"));
     }
 
@@ -80,18 +78,16 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
         Config config = connection.getFederation().getConfig();
 
         // #1 perform fake ASKs on fedup-id to know where triple patterns are
+        Integer hashModulo = Integer.parseInt(config.getProperty("fedup.summaryArg"));
+        ModuloOnSuffix hs = new ModuloOnSuffix(hashModulo);
+
         Query query = QueryFactory.create(queryString);
         Op op = Algebra.compile(query);
-        ToSourceSelectionTransforms tsst = new ToSourceSelectionTransforms(true, endpoints, ds4Asks);
+        ToSourceSelectionTransforms tsst = new ToSourceSelectionTransforms(hs, true, endpoints, ds4Asks);
         op = tsst.transform(op);
         // spy.numASKQueries = tsst.getNBASKs TODO if need be
 
         // #2 execute the transformed query on the summary
-        Integer hashModulo = Integer.parseInt(config.getProperty("fedup.summaryArg"));
-        ModuloOnSuffix hs = new ModuloOnSuffix(hashModulo);
-        op = Transformer.transform(hs, op);
-        op = Transformer.transform(new RemoveFilterTransformerLol(), op); // remove filter on summaries
-
         Dataset dataset = TDB2Factory.connectDataset(config.getProperty("fedup.summary"));
         dataset.begin(ReadWrite.READ);
         QueryEngineTDB.register(); // TODO double check if it reorder or not
@@ -119,13 +115,10 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
         dataset.commit();
         dataset.end();
 
-        assignments = this.removeInclusions(assignments);
+        assignments = removeInclusions(assignments);
 
         spy.assignments = assignments;
         spy.numAssignments = assignments.size();
-        spy.numValidAssignments = optimalAssignments.size();
-        spy.numFoundAssignments = optimalAssignments.size() - this.countMissingAssignments(assignments, optimalAssignments);
-
 
         // #3 Inject sources into the initial query so it can be executed
         Graph2TripleVisitor g2tp = new Graph2TripleVisitor();
@@ -166,7 +159,7 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
         }
 
         return fedXAssignments;
+        // return new UoJvsJoU(this.connection).selectBestAssignment(queryString, fedXAssignments, spy);
     }
-
 
 }

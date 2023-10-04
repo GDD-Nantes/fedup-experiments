@@ -40,8 +40,7 @@ public class ASKParallel {
             this.filters = filters;
         } else {
             this.filters = new Predicate[1];
-            this.filters[0] = triple -> triple.getSubject().isVariable() && triple.getObject().isURI() ||
-                    triple.getSubject().isURI() && triple.getObject().isVariable();
+            this.filters[0] = triple -> !triple.getSubject().isVariable() || !triple.getObject().isVariable();
         }
     }
 

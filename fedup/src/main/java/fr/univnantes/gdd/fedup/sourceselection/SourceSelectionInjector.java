@@ -24,8 +24,8 @@ public class SourceSelectionInjector extends SourceSelection {
 
     @Override
     public void performSourceSelection(List<List<StatementPattern>> bgps) { 
-        SourceAssignments sourceAssignments = SourceAssignments.getInstance();
-        Map<StatementPattern, List<StatementSource>> assignment = sourceAssignments.getNextAssignment();
+        SourceAssignmentsSingleton sourceAssignmentsSingleton = SourceAssignmentsSingleton.getInstance();
+        Map<StatementPattern, List<StatementSource>> assignment = sourceAssignmentsSingleton.getNextAssignment();
 
         stmtToSources = new ConcurrentHashMap<StatementPattern, List<StatementSource>>();
 

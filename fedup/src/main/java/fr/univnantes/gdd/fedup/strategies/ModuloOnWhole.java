@@ -4,7 +4,9 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.Transformer;
+import org.apache.jena.sparql.algebra.op.OpConditional;
 import org.apache.jena.sparql.algebra.op.OpFilter;
+import org.apache.jena.sparql.algebra.op.OpLeftJoin;
 import org.apache.jena.sparql.core.Var;
 
 import javax.print.attribute.URISyntax;
@@ -35,7 +37,12 @@ public class ModuloOnWhole extends LeavePredicateUntouched {
 
     @Override
     public Op transform(OpFilter opFilter, Op subOp) {
-        return Transformer.transform(this, subOp); // TODO: handle special filter expressions, i.e., we don't want to remove simple equalities
+        return subOp; // TODO: handle special filter expressions, i.e., we don't want to remove simple equalities
+    }
+
+    @Override
+    public Op transform(OpLeftJoin opLeftJoin, Op left, Op right) {
+        return new OpConditional(left, right);
     }
 
 }
