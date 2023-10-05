@@ -64,8 +64,10 @@ public class FedUPQueryExecutor {
                             }
                         }
                     } catch (Exception e) {
-                        if (!(e.getMessage().toLowerCase().contains("interrupt") || e instanceof RuntimeInterruptedException)) { // if not cancel by the executor
-                            e.printStackTrace();
+                        if (!(e.getMessage().toLowerCase().contains("interrupt"))
+                                && !(e.getCause().getMessage().toLowerCase().contains("request aborted"))
+                                && !(e instanceof RuntimeInterruptedException)) {
+                            e.printStackTrace(); // print only exceptions that do not come from cancelling query execution tasks
                         }
                     } finally {
                         resultsManager.notifyComplete();
