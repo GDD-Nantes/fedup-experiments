@@ -44,7 +44,7 @@ import fr.univnantes.gdd.fedup.sourceselection.SourceSelectionPerformer;
 @RestController
 public class FedUPController {
 
-	private static Logger logger = LogManager.getLogger(FedUPController.class);
+	private static final Logger logger = LogManager.getLogger(FedUPController.class);
 
 	private List<String> loadEndpoints(String fileName) throws IOException {
         Path filePath = Path.of(fileName);
@@ -64,7 +64,10 @@ public class FedUPController {
 			return null;
 		}
 
-		Spy spy = new Spy();
+		Spy.reset(); // to avoid cumulating metrics of previous runs
+
+		long startTime = System.currentTimeMillis();
+
 		Config config = new Config(parameters.configFileName);
 
 		FedXSailRepository repository = FedXFactory.initializeSparqlFederation(config, endpoints);
@@ -74,13 +77,11 @@ public class FedUPController {
 			config.getProperty("fedup.sourceSelectionClass"), connection);
 
 		List<Map<StatementPattern, List<StatementSource>>> assignments;
-		assignments = sourceSelectionPerformer.performSourceSelection(parameters.queryString, parameters.assignments, spy);
-
-		// assignments = List.of(assignments.getLast());
+		assignments = sourceSelectionPerformer.performSourceSelection(parameters.queryString, parameters.assignments);
 
 		// new PrintQueryPlans((FedXConnection) connection.getSailConnection()).print(parameters.queryString, assignments);
 
-		spy.tpwss = Utils.computeTPWSS(assignments);
+		Spy.getInstance().tpwss = Utils.computeTPWSS(assignments);
 
 		// logger.debug("Assignments: " + assignments);
 
@@ -96,16 +97,20 @@ public class FedUPController {
 		System.out.println(queryString);
 		if (parameters.runQuery) {
 			FedUPQueryExecutor executor = new FedUPQueryExecutor(connection);
-			executor.execute(queryString, assignments, spy);
+			executor.execute(queryString, assignments);
 		}
 
-		logger.info("Source Selection Time: " + spy.sourceSelectionTime + "ms");
-		logger.info("Execution Time: " + spy.executionTime + "ms");
+		logger.info("Source Selection Time: " + Spy.getInstance().sourceSelectionTime + "ms");
+		logger.info("Execution Time: " + Spy.getInstance().executionTime + "ms");
 
 		connection.close();
 		repository.shutDown();
 
-		return spy;
+		long endTime = System.currentTimeMillis();
+
+		Spy.getInstance().runtime = endTime - startTime;
+
+		return Spy.getInstance();
 	}
 
 	@GetMapping("/sparql")

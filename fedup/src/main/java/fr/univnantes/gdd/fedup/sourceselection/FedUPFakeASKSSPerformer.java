@@ -56,13 +56,12 @@ import java.util.stream.Collectors;
  */
 public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
 
-    private static Logger logger = LogManager.getLogger(FedUPFakeASKSSPerformer.class);
+    private static final Logger logger = LogManager.getLogger(FedUPFakeASKSSPerformer.class);
 
     SailRepositoryConnection sailRepositoryConnection;
 
     Set<String> endpoints;
     Dataset ds4Asks;
-
 
     public FedUPFakeASKSSPerformer(SailRepositoryConnection connection) throws Exception {
         super(connection);
@@ -74,7 +73,7 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
     }
 
     @Override
-    public List<Map<StatementPattern, List<StatementSource>>> performSourceSelection(String queryString, List<Map<String, String>> optimalAssignments, Spy spy) throws Exception {
+    public List<Map<StatementPattern, List<StatementSource>>> performSourceSelection(String queryString, List<Map<String, String>> optimalAssignments) throws Exception {
         Config config = connection.getFederation().getConfig();
 
         // #1 perform fake ASKs on fedup-id to know where triple patterns are
@@ -85,7 +84,6 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
         Op op = Algebra.compile(query);
         ToSourceSelectionTransforms tsst = new ToSourceSelectionTransforms(hs, true, endpoints, ds4Asks);
         op = tsst.transform(op);
-        // spy.numASKQueries = tsst.getNBASKs TODO if need be
 
         // #2 execute the transformed query on the summary
         Dataset dataset = TDB2Factory.connectDataset(config.getProperty("fedup.summary"));
@@ -110,15 +108,15 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
             }
         }
         long endTime = System.currentTimeMillis();
-        spy.sourceSelectionTime = (endTime - startTime);
-        logger.debug(String.format("Query execution terminated… Took %s ms", spy.sourceSelectionTime));
+        Spy.getInstance().sourceSelectionTime = (endTime - startTime);
+        logger.debug(String.format("Query execution terminated… Took %s ms", Spy.getInstance().sourceSelectionTime));
         dataset.commit();
         dataset.end();
 
         assignments = removeInclusions(assignments);
 
-        spy.assignments = assignments;
-        spy.numAssignments = assignments.size();
+        Spy.getInstance().assignments = assignments;
+        Spy.getInstance().numAssignments = assignments.size();
 
         // #3 Inject sources into the initial query so it can be executed
         Graph2TripleVisitor g2tp = new Graph2TripleVisitor();
@@ -152,14 +150,14 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
                     StatementSource source = new StatementSource(endpoint.getId(), StatementSource.StatementSourceType.REMOTE);
                     StatementPattern pattern = var2bgp.get(Var.alloc(alias));
                     fedXAssignment.put(pattern, List.of(source));
-                    spy.tpAliases.put(alias, pattern.toString());
+                    Spy.getInstance().tpAliases.put(alias, pattern.toString());
                 }
             }
             fedXAssignments.add(fedXAssignment);
         }
 
         return fedXAssignments;
-        // return new UoJvsJoU(this.connection).selectBestAssignment(queryString, fedXAssignments, spy);
+        // return new UoJvsJoU(this.connection).selectBestAssignment(queryString, fedXAssignments);
     }
 
 }

@@ -1,5 +1,6 @@
 package fr.univnantes.gdd.fedup.asks;
 
+import fr.univnantes.gdd.fedup.Spy;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -62,6 +63,7 @@ public class ASKRunnable implements Runnable {
             default -> throw new UnsupportedOperationException();
         };
         this.asks.replace(id, response);
+        Spy.getInstance().numASKQueries += 1;
     }
 
 }

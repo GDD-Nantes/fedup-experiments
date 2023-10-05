@@ -2,18 +2,8 @@ package fr.univnantes.gdd.fedup.sourceselection;
 
 import com.fluidops.fedx.FedXConnection;
 import com.fluidops.fedx.algebra.StatementSource;
-import com.fluidops.fedx.optimizer.Optimizer;
-import com.fluidops.fedx.structures.QueryInfo;
-import com.fluidops.fedx.structures.QueryType;
 import fr.univnantes.gdd.fedup.Spy;
-import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.algebra.StatementPattern;
-import org.eclipse.rdf4j.query.algebra.TupleExpr;
-import org.eclipse.rdf4j.query.impl.EmptyBindingSet;
-import org.eclipse.rdf4j.query.impl.SimpleDataset;
-import org.eclipse.rdf4j.query.parser.ParsedOperation;
-import org.eclipse.rdf4j.query.parser.ParsedQuery;
-import org.eclipse.rdf4j.query.parser.QueryParserUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,36 +35,15 @@ public class UoJvsJoU {
         return List.of(jou);
     }
 
-    private int computeSACost(String queryString, List<Map<StatementPattern, List<StatementSource>>> assignment) throws Exception {
-        SourceAssignmentsSingleton sourceAssignmentsSingleton = SourceAssignmentsSingleton.getInstance();
-        sourceAssignmentsSingleton.setAssignments(assignment);
-
-        ParsedOperation query = QueryParserUtil.parseOperation(QueryLanguage.SPARQL, queryString, null);
-        QueryInfo qInfo = new QueryInfo(this.connection, queryString, QueryType.SELECT, this.connection.getSummary());
-        TupleExpr tupleExpr = ((ParsedQuery)query).getTupleExpr();
-
-        int cost = 0;
-        while (sourceAssignmentsSingleton.hasNextAssignment()) {
-            TupleExpr queryPlan = Optimizer.optimize(tupleExpr, new SimpleDataset(), EmptyBindingSet.getInstance(), this.connection.getStrategy(), qInfo);
-
-            SACostVisitor visitor = new SACostVisitor();
-            queryPlan.visit(visitor);
-            cost += visitor.getCost();
-        }
-        return cost;
-    }
-
-    public List<Map<StatementPattern, List<StatementSource>>> selectBestAssignment(String queryString, List<Map<StatementPattern, List<StatementSource>>> uoj, Spy spy) throws Exception {
-        int uojCost = this.computeSACost(queryString, uoj);
+    public List<Map<StatementPattern, List<StatementSource>>> selectBestAssignment(String queryString, List<Map<StatementPattern, List<StatementSource>>> uoj) throws Exception {
+        int uojCost = SACost.compute(this.connection, queryString, uoj).stream().reduce(0, Integer::sum);
 
         List<Map<StatementPattern, List<StatementSource>>> jou = this.generateJoUFromUoJ(uoj);
-        int jouCost = this.computeSACost(queryString, jou);
+        int jouCost = SACost.compute(this.connection, queryString, jou).stream().reduce(0, Integer::sum);
 
         if (uojCost <= jouCost) {
-            spy.planType = "UoJ";
             return uoj;
         } else {
-            spy.planType = "JoU";
             return jou;
         }
     }

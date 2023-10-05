@@ -136,6 +136,7 @@ def zero_result(status):
         "status": status,
         "sourceSelectionTime": 0,
         "executionTime": 0,
+        "runtime": 0,
         "numASKQueries": 0,
         "numSolutions": 0,
         "numAssignments": 0,
@@ -201,8 +202,8 @@ rule merge_all:
         dataframes = []
         projected_columns = [
             "query", "approach", "run", "workload",
-            "sourceSelectionTime", "executionTime",
-            "numASKQueries", "tpwss", "numAssignments", "numSolutions", "planType"]
+            "sourceSelectionTime", "executionTime", "runtime",
+            "numASKQueries", "tpwss", "numAssignments", "numSolutions"]
         for file in input:
             try:
                 df = pandas.read_csv(file)

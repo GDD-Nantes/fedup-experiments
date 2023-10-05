@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 
 public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
 
-    private static Logger logger = LogManager.getLogger(FedUPSourceSelectionPerformer.class);
+    private static final Logger logger = LogManager.getLogger(FedUPSourceSelectionPerformer.class);
 
     Set<String> endpoints;
     Dataset ds4Asks;
@@ -67,7 +67,7 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
 
     @Override
     public List<Map<StatementPattern, List<StatementSource>>> performSourceSelection(
-        String queryString, List<Map<String, String>> optimalAssignments, Spy spy
+        String queryString, List<Map<String, String>> optimalAssignments
     ) throws Exception {
         Config config = this.connection.getFederation().getConfig();
 
@@ -107,12 +107,12 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         long endTime = System.currentTimeMillis();
         logger.debug("Query execution terminated...");
 
-        spy.sourceSelectionTime = (endTime - startTime);
+        Spy.getInstance().sourceSelectionTime = (endTime - startTime);
 
         assignments = removeInclusions(assignments);
 
-        spy.assignments = assignments;
-        spy.numAssignments = assignments.size();
+        Spy.getInstance().assignments = assignments;
+        Spy.getInstance().numAssignments = assignments.size();
 
         List<Map<StatementPattern, List<StatementSource>>> fedXAssignments = new ArrayList<>();
 
@@ -144,7 +144,7 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
                     StatementSource source = new StatementSource(endpoint.getId(), StatementSourceType.REMOTE);
                     StatementPattern pattern = var2bgp.get(Var.alloc(alias));
                     fedXAssignment.put(pattern, List.of(source));
-                    spy.tpAliases.put(alias, pattern.toString());
+                    Spy.getInstance().tpAliases.put(alias, pattern.toString());
                 }
             }
             fedXAssignments.add(fedXAssignment);
@@ -153,7 +153,7 @@ public class FedUPSourceSelectionPerformer extends SourceSelectionPerformer {
         dataset.end();
 
         return fedXAssignments;
-        // return new UoJvsJoU(this.connection).selectBestAssignment(queryString, fedXAssignments, spy);
+        // return new UoJvsJoU(this.connection).selectBestAssignment(queryString, fedXAssignments);
     }
 
     protected Map<String, String> bindingToMap(Binding binding) {

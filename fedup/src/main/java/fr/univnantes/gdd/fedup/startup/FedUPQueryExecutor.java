@@ -1,7 +1,10 @@
 package fr.univnantes.gdd.fedup.startup;
 
+import com.fluidops.fedx.FedXConnection;
 import com.fluidops.fedx.algebra.StatementSource;
+import com.fluidops.fedx.exception.RuntimeInterruptedException;
 import fr.univnantes.gdd.fedup.Spy;
+import fr.univnantes.gdd.fedup.sourceselection.SACost;
 import fr.univnantes.gdd.fedup.sourceselection.SourceAssignmentsSingleton;
 import org.apache.commons.collections4.MultiSet;
 import org.apache.commons.collections4.multiset.HashMultiSet;
@@ -19,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class FedUPQueryExecutor {
@@ -29,34 +33,38 @@ public class FedUPQueryExecutor {
         this.connection = connection;
     }
 
-    public void execute(String queryString, List<Map<StatementPattern, List<StatementSource>>> assignments, Spy spy) throws Exception {
-        SourceAssignmentsSingleton.getInstance().setAssignments(assignments);
+    public void execute(String queryString, List<Map<StatementPattern, List<StatementSource>>> assignments) throws Exception {
+        List<Integer> costs = SACost.compute((FedXConnection) this.connection.getSailConnection(), queryString, assignments);
 
-        int numSubQueries = assignments.size();
+        List<Map<StatementPattern, List<StatementSource>>> sortedAssignments = IntStream.range(0, assignments.size())
+                .boxed()
+                .sorted(Comparator.comparingInt(costs::get))
+                .map(assignments::get)
+                .toList();
 
-        // ExecutorService executor = Executors.newFixedThreadPool(Math.max(Math.min(numSubQueries, 8), 1));
-
-        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor(); // since java21 masterclass
+        SourceAssignmentsSingleton.getInstance().setAssignments(sortedAssignments);
 
         Query query = QueryFactory.create(queryString);
 
-        ResultsManager resultsManager = new ResultsManager(numSubQueries, query);
-        List<Future<?>> futures = new ArrayList<>();
+        ResultsManager resultsManager = new ResultsManager(assignments.size(), query);
 
-        long startTime = System.currentTimeMillis();
-        try {
-            for (int i = 0; i < numSubQueries; i++) {
+        List<Future<?>> futures = new ArrayList<>();
+        try (ExecutorService executor = Executors.newFixedThreadPool(Math.max(Math.min(assignments.size(), 8), 1))) {
+            long startTime = System.currentTimeMillis();
+            for (int i = 0; i < assignments.size(); i++) {
                 Future<?> future = executor.submit(() -> {
                     try {
-                        TupleQuery q = this.connection.prepareTupleQuery(queryString);
-                        TupleQueryResult results = q.evaluate();
-                        while (results.hasNext()) {
-                            if (resultsManager.addSolution(results.next())) {
-                                break;
+                        if (!resultsManager.isLimitReached()) {
+                            TupleQuery q = this.connection.prepareTupleQuery(queryString);
+                            TupleQueryResult results = q.evaluate();
+                            while (results.hasNext()) {
+                                if (resultsManager.addSolution(results.next())) {
+                                    break;
+                                }
                             }
                         }
                     } catch (Exception e) {
-                        if (!(e.getMessage().contains("interrupt"))) { // if not cancel by the executor
+                        if (!(e.getMessage().toLowerCase().contains("interrupt") || e instanceof RuntimeInterruptedException)) { // if not cancel by the executor
                             e.printStackTrace();
                         }
                     } finally {
@@ -67,18 +75,12 @@ public class FedUPQueryExecutor {
             }
             resultsManager.waitForResults();
             futures.forEach(f -> f.cancel(true));
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            executor.shutdownNow();
+            long endTime = System.currentTimeMillis(); // not outside the try statement to avoid counting FedX shutdown time in query execution time
+
+            Spy.getInstance().solutions = resultsManager.getSolutions();
+            Spy.getInstance().numSolutions += resultsManager.size();
+            Spy.getInstance().executionTime = endTime - startTime;
         }
-        long endTime = System.currentTimeMillis();
-        
-        // TODO: Returns solutions
-        List<String> solutions = resultsManager.getSolutions();
-        spy.solutions = solutions;
-        spy.numSolutions += solutions.size();
-        spy.executionTime = endTime - startTime;
     }
 
     private class ResultsManager {
@@ -126,17 +128,21 @@ public class FedUPQueryExecutor {
             this.remainingProducers = remainingProducers;
         }
 
+        public synchronized boolean isLimitReached() {
+            return this.size() >= this.limit || this.completeSolutions >= this.limitOptionalOrOrderBy;
+        }
+
         public void addProducer() {
             this.remainingProducers += 1;
         }
 
         public synchronized void waitForResults() {
-            while (this.size() < this.limit &&
-                    this.completeSolutions < this.limitOptionalOrOrderBy &&
-                    this.remainingProducers > 0) {
+            while (this.size() < this.limit
+                    && this.completeSolutions < this.limitOptionalOrOrderBy
+                    && this.remainingProducers > 0) {
                 try {
                     wait();
-                } catch (InterruptedException e) { }
+                } catch (InterruptedException ignored) { }
             }
         }
 
@@ -167,7 +173,6 @@ public class FedUPQueryExecutor {
             } else {
                 this.bindings.add(solution);
             }
-            notifyAll();
             return this.size() >= this.limit || this.completeSolutions >= this.limitOptionalOrOrderBy ;
         }
 
@@ -180,17 +185,17 @@ public class FedUPQueryExecutor {
             Stream<BindingSet> result = query.isDistinct() ? bindings.uniqueSet().stream() : bindings.stream();
             if (query.hasOrderBy()) { // ugly !
                 // post-process ORDER BY when we have all results needed
-                result = result.sorted((a,b) -> {
-                            for (SortCondition sc : hasOrderBy.result.getConditions()) {
-                                Var v = sc.expression.asVar();
-                                int compared = a.getValue(v.getVarName()).stringValue()
-                                        .compareTo(b.getValue(v.getVarName()).stringValue());
-                                if (compared != 0) {
-                                    return compared;
-                                }
-                            }
-                            return 0;
-                        });
+                result = result.sorted((a, b) -> {
+                    for (SortCondition sc : hasOrderBy.result.getConditions()) {
+                        Var v = sc.expression.asVar();
+                        int compared = a.getValue(v.getVarName()).stringValue()
+                                .compareTo(b.getValue(v.getVarName()).stringValue());
+                        if (compared != 0) {
+                            return compared;
+                        }
+                    }
+                    return 0;
+                });
             }
             return result.map(BindingSet::toString).toList();
         }
