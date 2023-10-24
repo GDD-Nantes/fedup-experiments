@@ -306,7 +306,7 @@ if "skipLoad" not in config:
             dataset = ancient("datasets/fedshop{n}.nq.gz"),
             virtuoso = ancient(VIRTUOSO_HOME),
             virtuoso_isql = ancient(f"{VIRTUOSO_HOME}/bin/isql"),
-            virtuoso_configfile = ancient(f"{VIRTUOSO_HOME}/var/lib/virtuoso/db/virtuoso.ini")
+            virtuoso_configfile = ancient(f"{VIRTUOSO_HOME}/var/lib/virtuoso/db/fedup.ini")
         output:
             graphs = "config/fedshop{n}/graphs.txt"
         params:
@@ -327,7 +327,7 @@ if "skipLoad" not in config:
             dataset = ancient("datasets/largerdfbench.nq.gz"),
             virtuoso = ancient(VIRTUOSO_HOME),
             virtuoso_isql = ancient(f"{VIRTUOSO_HOME}/bin/isql"),
-            virtuoso_configfile = ancient(f"{VIRTUOSO_HOME}/var/lib/virtuoso/db/virtuoso.ini")
+            virtuoso_configfile = ancient(f"{VIRTUOSO_HOME}/var/lib/virtuoso/db/fedup.ini")
         output:
             graphs = "config/largerdfbench/graphs.txt"
         shell:
