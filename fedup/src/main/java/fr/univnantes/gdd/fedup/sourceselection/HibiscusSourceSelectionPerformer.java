@@ -1,9 +1,12 @@
 package fr.univnantes.gdd.fedup.sourceselection;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import org.aksw.simba.quetsal.core.HibiscusSourceSelection;
+import org.apache.jena.sparql.pfunction.library.version;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.rdf4j.query.algebra.StatementPattern;
@@ -46,8 +49,24 @@ public class HibiscusSourceSelectionPerformer extends SourceSelectionPerformer {
         long endTime = System.currentTimeMillis();
 
         Spy.getInstance().sourceSelectionTime = endTime - startTime;
+        
+        List<Map<String, String>> assignments = new ArrayList<>() ;
 
-        return List.of(sourceSelection.getStmtToSources());
+        Map<StatementPattern, List<StatementSource>> sourceAssignments = sourceSelection.getStmtToSources();
+
+        for (StatementPattern tp: sourceAssignments.keySet()) {
+            List<StatementSource> sources = sourceAssignments.get(tp);
+            for (StatementSource source: sources) {
+                Map<String, String> assingment = new HashMap<>();
+                assingment.put(tp.toString(), source.toString());
+                assignments.add(assingment);
+            }
+        }
+
+        Spy.getInstance().assignments = assignments;
+        Spy.getInstance().numAssignments = assignments.size();
+
+        return List.of(sourceAssignments);
     }
 
     private static class SourceSelection extends HibiscusSourceSelection {
