@@ -533,16 +533,18 @@ rule run_all_queries:
 rule run_xp:
     input: "output/data.csv"
 
-# onstart:
-#     shell("mvn clean install")
-# onsuccess:
-#     shell(f"python commons.py stop-process {VIRTUOSO_PORT}")
-#     shell(f"python commons.py stop-process {FUSEKI_PORT}")
-#     shell(f"python commons.py stop-process {FEDUP_PORT}")
-# onerror:
-#     shell(f"python commons.py stop-process {VIRTUOSO_PORT}")
-#     shell(f"python commons.py stop-process {FUSEKI_PORT}")
-#     shell(f"python commons.py stop-process {FEDUP_PORT}")
+if "skipCompile" not in config:
+    onstart:
+        shell("mvn clean install")
+if "keepAlive" not in config:
+    onsuccess:
+        shell(f"python commons.py stop-virtuoso {VIRTUOSO_HOME}/var/lib/virtuoso/db/fedup.ini")
+        shell(f"python commons.py stop-fuseki {FUSEKI_PORT}")
+        shell(f"python commons.py stop-fedup {FEDUP_PORT}")
+    onerror:
+        shell(f"python commons.py stop-virtuoso {VIRTUOSO_HOME}/var/lib/virtuoso/db/fedup.ini")
+        shell(f"python commons.py stop-fuseki {FUSEKI_PORT}")
+        shell(f"python commons.py stop-fedup {FEDUP_PORT}")
 
 # import os
 # import json
