@@ -165,7 +165,7 @@ def run_rsa_query(query, port, metrics_output, solutions_output):
             "sourceSelectionTime": [0],
             "executionTime": [(end_time - start_time) * 1000],
             "runtime": [(end_time - start_time) * 1000],
-            "numAskQueries": [0],
+            "numASKQueries": [0],
             "numSolutions": [len(solutions["results"]["bindings"])],
             "numAssignments": [0],
             "tpwss": [0]
@@ -208,7 +208,7 @@ def run_query(query, endpoints, config, port, metrics_output, solutions_output):
             "sourceSelectionTime",
             "executionTime",
             "runtime",
-            "numAskQueries",
+            "numASKQueries",
             "numSolutions",
             "numAssignments",
             "tpwss"
