@@ -15,7 +15,7 @@ import SPARQLWrapper
 
 JENA_HOME = f"{os.getcwd()}/apache-jena-4.9.0"
 FUSEKI_HOME = f"{os.getcwd()}/apache-jena-fuseki-4.9.0"
-VIRTUOSO_HOME = f"{os.getcwd()}/virtuoso-opensource-7.2.11"
+VIRTUOSO_HOME = f"{os.getcwd()}/virtuoso-opensource-7.2.7"
 
 VIRTUOSO_PORT = 8890
 FUSEKI_PORT = 3030
@@ -282,9 +282,9 @@ if "skipInstall" not in config:
             virtuoso_configfile = f"{VIRTUOSO_HOME}/var/lib/virtuoso/db/virtuoso.ini"
         shell:
             f"""
-            wget https://github.com/openlink/virtuoso-opensource/releases/download/v7.2.11/virtuoso-opensource-7.2.11.tar.gz
-            tar -zxf virtuoso-opensource-7.2.11.tar.gz
-            cd virtuoso-opensource-7.2.11
+            wget https://github.com/openlink/virtuoso-opensource/releases/download/v7.2.7/virtuoso-opensource-7.2.7.tar.gz
+            tar -zxf virtuoso-opensource-7.2.7.tar.gz
+            cd virtuoso-opensource-7.2.7
             ./autogen.sh
             ./configure
             make && make install prefix={VIRTUOSO_HOME} && make clean && make distclean
@@ -513,7 +513,7 @@ rule run_query:
         shell(f"timeout {{params.timeout}} python commons.py run-query {{input.query}} {{input.endpoints}} {os.getcwd()}/{{input.approach_configfile}} --metrics-output {{output.metrics}} --solutions-output {{output.solutions}} || true")
         df = pandas.read_csv(str(output.metrics))
         df["query"] = wildcards.query
-        df["workload"] = "{wildcards.workload}{wildcards.scale}"
+        df["workload"] = f"{wildcards.workload}{wildcards.scale}"
         df["approach"] = wildcards.approach
         df["run"] = wildcards.run
         if df["status"].values[0] == "timeout":
