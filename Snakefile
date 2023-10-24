@@ -48,6 +48,9 @@ LARGERDFBENCH_QUERIES = [
     "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10"
 ]
 
+LARGERDFBENCH_TIMEOUT = 1200 # 20 minutes
+FEDSHOP_TIMEOUT = 60 # 1 minute
+
 # Test configuration
 
 # LARGERDFBENCH_TIMEOUT = 1200 # 20 minutes
@@ -340,15 +343,14 @@ if "skipLoad" not in config:
 rule setup_virtuoso:
     priority: 100
     input:
-        virtuoso_port = str(VIRTUOSO_PORT),
         virtuoso_configfile = f"{VIRTUOSO_HOME}/var/lib/virtuoso/db/virtuoso.ini"
     output:
         virtuoso_configfile = f"{VIRTUOSO_HOME}/var/lib/virtuoso/db/fedup.ini"
     shell:
         f"""
         cp {{input.virtuoso_configfile}} {{output.virtuoso_configfile}}
-        sed -i -E 's@(^ServerPort.*?= [^(1111)].*?$)@ServerPort = {{input.virtuoso_port}}@g' {{output.virtuoso_configfile}} # update Virtuoso port
-        sed -i -E 's@(^DefaultHost.*$)@DefaultHost = localhost:{{input.virtuoso_port}}@g' {{output.virtuoso_configfile}} # update Virtuoso port
+        sed -i -E 's@(^ServerPort.*?= [^(1111)].*?$)@ServerPort = {VIRTUOSO_PORT}@g' {{output.virtuoso_configfile}} # update Virtuoso port
+        sed -i -E 's@(^DefaultHost.*$)@DefaultHost = localhost:{VIRTUOSO_PORT}@g' {{output.virtuoso_configfile}} # update Virtuoso port
         sed -i -E 's@DirsAllowed(.*)$@DirsAllowed\\1, {os.getcwd()}@g' {{output.virtuoso_configfile}} # allow data to be loaded from the FedUP directory
         sed -i -E 's@(^ResultSetMaxRows.*$)@;\\1@g' {{output.virtuoso_configfile}} # disable quotas on query results
         sed -i -E 's@(^MaxQueryCostEstimationTime.*$)@;\\1@g' {{output.virtuoso_configfile}} # disable quotas on query plans
@@ -362,12 +364,11 @@ rule setup_virtuoso:
 
 rule generate_endpoints:
     input:
-        virtuoso_port = str(VIRTUOSO_PORT),
         graphs = "config/{dataset}/graphs.txt"
     output:
         endpoints = "config/{dataset,(largerdfbench|fedshop[0-9]+)}/endpoints.txt"
     shell:
-        "sed -E 's@(^.*$)@http://localhost:{input.virtuoso_port}/sparql?default-graph-uri=\\1@g' {input.graphs} > {output.endpoints}"
+        f"sed -E 's@(^.*$)@http://localhost:{VIRTUOSO_PORT}/sparql?default-graph-uri=\\1@g' {{input.graphs}} > {{output.endpoints}}"
 
 if "skipGenerate" not in config:
 
