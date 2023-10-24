@@ -73,7 +73,7 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
         Config config = connection.getFederation().getConfig();
 
         Dataset ds4Asks = null;
-        if (!config.getProperty("fedup.id").isEmpty()) {
+        if (Objects.nonNull(config.getProperty("fedup.id"))) {
             ds4Asks = TDB2Factory.connectDataset(config.getProperty("fedup.id"));
         }
         
