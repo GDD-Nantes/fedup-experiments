@@ -1,0 +1,26 @@
+PREFIX dbpedia: <http://dbpedia.org/ontology/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX drugbank: <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/>
+
+SELECT * WHERE {
+	SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/dbpedia> {
+	    ?Drug rdf:type dbpedia:Drug .
+	}
+	SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/drugbank> {
+        ?drugbankDrug owl:sameAs ?Drug .
+        ?InteractionName drugbank:interactionDrug1 ?drugbankDrug .
+        ?InteractionName drugbank:interactionDrug2 ?drugbankDrug2 .
+        ?InteractionName drugbank:text ?IntEffect .
+	}
+	OPTIONAL {
+        SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/drugbank> {
+            ?drugbankDrug  drugbank:affectedOrganism "Humans and other mammals" ;
+                drugbank:description ?description ;
+                drugbank:structure ?structure ;
+                drugbank:casRegistryNumber ?casRegistryNumber .
+        }
+    }
+}
+ORDER BY (?drugbankDrug)
+LIMIT 100

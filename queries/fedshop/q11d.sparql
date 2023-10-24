@@ -1,0 +1,9 @@
+PREFIX bsbm: <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/>
+
+SELECT ?property ?hasValue ?isValueOf WHERE {
+    # const <http://www.vendor0.fr/Offer349>
+    <http://www.vendor0.fr/Offer349> bsbm:product ?product . 
+    { <http://www.vendor0.fr/Offer349> ?property ?hasValue }
+    UNION
+    { ?isValueOf ?property <http://www.vendor0.fr/Offer349> }
+}

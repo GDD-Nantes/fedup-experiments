@@ -1,0 +1,33 @@
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX geonames: <http://www.geonames.org/ontology#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX mo: <http://purl.org/ontology/mo/>
+PREFIX nytimes: <http://data.nytimes.com/elements/>
+
+SELECT DISTINCT ?artist ?name ?location ?anylocation WHERE {
+	SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/jamendo> {
+		?artist a mo:MusicArtist ;
+            foaf:name ?name ;
+            foaf:based_near ?location .
+	}
+	{
+		SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/geonames> {
+            ?location geonames:parentFeature ?locationName .
+            ?locationName geonames:name ?anylocation .
+		}
+	} UNION {
+        SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/nyt> {
+            ?location geonames:parentFeature ?locationName .
+            ?locationName geonames:name ?anylocation .
+        }
+    }
+    SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/nyt> {
+        ?nytLocation owl:sameAs ?location .
+        ?nytLocation nytimes:topicPage ?news .
+    }
+    OPTIONAL {
+        SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/geonames> {
+            ?locationName geonames:name "Islamic Republic of Afghanistan" .
+        }
+    }
+}

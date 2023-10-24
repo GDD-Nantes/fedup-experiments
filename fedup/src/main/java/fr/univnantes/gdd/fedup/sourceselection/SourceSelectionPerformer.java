@@ -19,6 +19,6 @@ public abstract class SourceSelectionPerformer {
         this.connection = ((FedXConnection) connection.getSailConnection());
     }
 
-    public abstract List<Map<StatementPattern, List<StatementSource>>> performSourceSelection(String queryString, List<Map<String, String>> groundtruth) throws Exception;
+    public abstract List<Map<StatementPattern, List<StatementSource>>> performSourceSelection(String queryString) throws Exception;
 
 }

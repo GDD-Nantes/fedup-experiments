@@ -28,7 +28,6 @@ buildNumber.properties
 apache-jena-*
 summaries
 datasets
-queries
 output
 .snakemake
 .m2

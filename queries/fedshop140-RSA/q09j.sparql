@@ -1,0 +1,9 @@
+PREFIX rev: <http://purl.org/stuff/rev#>
+
+SELECT DISTINCT ?x WHERE { 
+    VALUES ( ?bgp1 ) { ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite4.fr> ) }
+    SERVICE ?bgp1 {
+        # const <http://www.ratingsite4.fr/Review6027>
+        <http://www.ratingsite4.fr/Review6027> rev:reviewer ?x 
+    }
+}

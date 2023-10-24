@@ -1,0 +1,14 @@
+SELECT ?predicate ?object WHERE {
+    {
+        SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/drugbank> {
+            <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00201> ?predicate ?object .
+        }
+    } UNION {
+        SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/drugbank> {
+            <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00201> <http://www.w3.org/2002/07/owl#sameAs> ?caff .
+	    }
+	    SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/dbpedia>{
+	        ?caff ?predicate ?object .
+	    }
+	}
+}

@@ -19,11 +19,12 @@ import org.apache.jena.sparql.core.Var;
 
 public class HashSummarizer extends Summarizer {
 
-    private int modulo;
+    private final int modulo;
 
-    public HashSummarizer(Integer arg) {
-        super(arg);
-        this.modulo = arg;
+    public HashSummarizer(int... args) {
+        super(args);
+        assert args.length == 1;
+        this.modulo = args[0];
     }
     
     @Override

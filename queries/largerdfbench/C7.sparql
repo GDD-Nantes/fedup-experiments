@@ -1,0 +1,13 @@
+SELECT DISTINCT ?author ?role ?paper ?place ?capital ?latitude ?longitude ?proceedings WHERE {
+    ?proceedings <http://data.semanticweb.org/ns/swc/ontology#relatedToEvent> <http://data.semanticweb.org/conference/eswc/2010> .
+    ?paper <http://data.semanticweb.org/ns/swc/ontology#isPartOf> ?proceedings .
+    ?paper <http://swrc.ontoware.org/ontology#author> ?author .
+    ?role <http://data.semanticweb.org/ns/swc/ontology#heldBy> ?author .
+    ?role <http://data.semanticweb.org/ns/swc/ontology#isRoleAt> <http://data.semanticweb.org/conference/eswc/2010> .
+    ?author <http://xmlns.com/foaf/0.1/based_near> ?place .
+    OPTIONAL {
+        ?place <http://dbpedia.org/ontology/capital> ?capital .
+        ?place <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ?latitude .
+        ?place <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?longitude .
+    }
+}

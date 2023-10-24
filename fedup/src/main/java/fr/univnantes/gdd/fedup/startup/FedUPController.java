@@ -56,28 +56,20 @@ public class FedUPController {
 		public Spy onFedQuery(
 		@RequestBody InputParameters parameters
 	) throws Exception {
-		List<String> endpoints;
-		try {
-			endpoints = this.loadEndpoints(parameters.endpointsFileName);
-		} catch (IOException exception) {
-			logger.error("Error when loading endpoints: " + exception);
-			return null;
-		}
-
 		Spy.reset(); // to avoid cumulating metrics of previous runs
 
 		long startTime = System.currentTimeMillis();
 
 		Config config = new Config(parameters.configFileName);
 
-		FedXSailRepository repository = FedXFactory.initializeSparqlFederation(config, endpoints);
+		FedXSailRepository repository = FedXFactory.initializeSparqlFederation(config, parameters.endpoints);
 		SailRepositoryConnection connection = repository.getConnection();
             
 		SourceSelectionPerformer sourceSelectionPerformer = (SourceSelectionPerformer) Util.instantiate(
 			config.getProperty("fedup.sourceSelectionClass"), connection);
 
 		List<Map<StatementPattern, List<StatementSource>>> assignments;
-		assignments = sourceSelectionPerformer.performSourceSelection(parameters.queryString, parameters.assignments);
+		assignments = sourceSelectionPerformer.performSourceSelection(parameters.queryString);
 
 		// new PrintQueryPlans((FedXConnection) connection.getSailConnection()).print(parameters.queryString, assignments);
 

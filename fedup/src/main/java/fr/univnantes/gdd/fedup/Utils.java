@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.jena.base.Sys;
 import org.apache.jena.query.QueryFactory;
 import org.eclipse.rdf4j.query.algebra.LeftJoin;
 import org.eclipse.rdf4j.query.algebra.QueryModelNode;
@@ -108,7 +109,7 @@ public class Utils {
 
     public static long computeTPWSS(List<Map<StatementPattern, List<StatementSource>>> assignments) {
         return convertListofMapToMapofList(assignments).values().stream()
-            .mapToLong(column -> column.size())
+            .mapToLong(Set::size)
             .sum();
     }
 

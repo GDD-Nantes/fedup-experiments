@@ -8,8 +8,8 @@ import org.apache.jena.sparql.core.Quad;
 
 public class IdentitySummarizer extends Summarizer {
 
-    public IdentitySummarizer(Integer arg) {
-        super(arg);
+    public IdentitySummarizer(int... args) {
+        super(args);
     }
 
     @Override

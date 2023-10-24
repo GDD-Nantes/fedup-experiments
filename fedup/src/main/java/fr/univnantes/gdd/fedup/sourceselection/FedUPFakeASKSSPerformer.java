@@ -57,25 +57,26 @@ import java.util.stream.Collectors;
 public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
 
     private static final Logger logger = LogManager.getLogger(FedUPFakeASKSSPerformer.class);
-
-    SailRepositoryConnection sailRepositoryConnection;
-
+    
     Set<String> endpoints;
-    Dataset ds4Asks;
 
     public FedUPFakeASKSSPerformer(SailRepositoryConnection connection) throws Exception {
         super(connection);
-        this.sailRepositoryConnection = connection;
 
         // #1 transform the query to get fake ASKs
-        endpoints = this.connection.getEndpoints().stream().map(e -> e.getEndpoint().substring(e.getEndpoint().indexOf("default-graph-uri=") + 18)).collect(Collectors.toSet()); // get graph names from endpoints
-        ds4Asks = TDB2Factory.connectDataset(this.connection.getFederation().getConfig().getProperty("fedup.id"));
+        // endpoints = this.connection.getEndpoints().stream().map(e -> e.getEndpoint().substring(e.getEndpoint().indexOf("default-graph-uri=") + 18)).collect(Collectors.toSet()); // get graph names from endpoints
+        endpoints = this.connection.getEndpoints().stream().map(Endpoint::getEndpoint).collect(Collectors.toSet());
     }
 
     @Override
-    public List<Map<StatementPattern, List<StatementSource>>> performSourceSelection(String queryString, List<Map<String, String>> optimalAssignments) throws Exception {
+    public List<Map<StatementPattern, List<StatementSource>>> performSourceSelection(String queryString) throws Exception {
         Config config = connection.getFederation().getConfig();
 
+        Dataset ds4Asks = null;
+        if (!config.getProperty("fedup.id").isEmpty()) {
+            ds4Asks = TDB2Factory.connectDataset(config.getProperty("fedup.id"));
+        }
+        
         // #1 perform fake ASKs on fedup-id to know where triple patterns are
         Integer hashModulo = Integer.parseInt(config.getProperty("fedup.summaryArg"));
         ModuloOnSuffix hs = new ModuloOnSuffix(hashModulo);
@@ -127,10 +128,9 @@ public class FedUPFakeASKSSPerformer extends FedUPSourceSelectionPerformer {
             OpQuad opQuad = new OpQuad(new Quad(e.getKey(), e.getValue()));
             OpQuad opOriginal = (OpQuad) hs.getToOriginal().get(opQuad);
             OpTriple opTriple = new OpTriple(opOriginal.getQuad().asTriple());
-            Query q = OpAsQuery.asQuery(opTriple);
-            String tripleAsString = q.toString();
+            String tripleAsString = OpAsQuery.asQuery(opTriple).toString();
             ParsedQuery parseQuery = new SPARQLParser().parseQuery(tripleAsString, "http://donotcare.com/wathever");
-            StatementPattern bgp = null;
+            StatementPattern bgp;
             try {
                 List<List<StatementPattern>> bgps = Utils.getBasicGraphPatterns(parseQuery);
                 bgp = bgps.get(0).get(0);

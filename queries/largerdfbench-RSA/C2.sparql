@@ -1,0 +1,33 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX drugbank: <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/>
+PREFIX kegg: <http://bio2rdf.org/ns/kegg#>
+PREFIX chebi: <http://bio2rdf.org/ns/chebi#>
+PREFIX purl: <http://purl.org/dc/elements/1.1/>
+PREFIX bio2RDF: <http://bio2rdf.org/ns/bio2rdf#>
+
+SELECT ?drug ?keggmass ?chebiIupacName WHERE {
+	SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/drugbank> {
+        ?drug rdf:type drugbank:drugs .
+        ?drug drugbank:keggCompoundId ?keggDrug .
+	}
+	SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/kegg> {
+	    ?keggDrug bio2RDF:mass ?keggmass .
+    }
+	SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/drugbank> {
+	    ?drug drugbank:genericName ?drugBankName .
+    }
+	SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/chebi> {
+        ?chebiDrug purl:title ?drugBankName .
+        ?chebiDrug chebi:iupacName ?chebiIupacName .
+	}
+    OPTIONAL {
+        SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/drugbank> {
+            ?drug drugbank:inchiIdentifier ?drugbankInchi .
+        }
+        SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/chebi> {
+            ?chebiDrug bio2RDF:inchi ?chebiInchi.
+        }
+        FILTER (?drugbankInchi = ?chebiInchi)
+    }
+}

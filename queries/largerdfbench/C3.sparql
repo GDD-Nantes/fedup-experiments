@@ -1,0 +1,12 @@
+SELECT DISTINCT ?artist ?name ?location ?anylocation WHERE {
+    ?artist a <http://purl.org/ontology/mo/MusicArtist> .
+    ?artist <http://xmlns.com/foaf/0.1/name> ?name .
+    ?artist <http://xmlns.com/foaf/0.1/based_near> ?location .
+    ?location <http://www.geonames.org/ontology#parentFeature> ?locationName .
+    ?locationName <http://www.geonames.org/ontology#name> ?anylocation .
+    ?nytLocation <http://www.w3.org/2002/07/owl#sameAs> ?location .
+    ?nytLocation <http://data.nytimes.com/elements/topicPage> ?news .
+    OPTIONAL {
+        ?location <http://www.geonames.org/ontology#name> 'Islamic Republic of Afghanistan' .
+    }
+}

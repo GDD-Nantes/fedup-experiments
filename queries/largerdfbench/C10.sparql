@@ -1,0 +1,12 @@
+SELECT DISTINCT ?patient ?gender ?country ?popDensity ?drugName ?indication ?formula ?compound WHERE {
+    ?uri <http://tcga.deri.ie/schema/bcr_patient_barcode> ?patient .
+    ?patient <http://tcga.deri.ie/schema/gender> ?gender .
+    ?patient <http://dbpedia.org/ontology/country> ?country .
+    ?country <http://dbpedia.org/ontology/populationDensity> ?popDensity .
+    ?patient <http://tcga.deri.ie/schema/bcr_drug_barcode> ?drugbcr .
+    ?drugbcr <http://tcga.deri.ie/schema/drug_name> ?drugName . 
+    ?drgBnkDrg <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/genericName> ?drugName .
+    ?drgBnkDrg <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/indication> ?indication .
+    ?drgBnkDrg <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/chemicalFormula> ?formula .
+    ?drgBnkDrg <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/keggCompoundId> ?compound .
+}

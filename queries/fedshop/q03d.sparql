@@ -1,0 +1,33 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX bsbm: <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT ?product ?label WHERE {
+    ?localProduct owl:sameAs ?product .
+    ?localProduct rdfs:label ?label .
+    # const bsbm:ProductType594
+    ?localProduct rdf:type ?localProductType .
+    ?localProductType owl:sameAs bsbm:ProductType594 .
+
+    # const bsbm:ProductFeature16236
+    ?localProduct bsbm:productFeature ?localProductFeature1 .
+    ?localProductFeature1 owl:sameAs bsbm:ProductFeature16236 .
+    ?localProduct bsbm:productPropertyNumeric1 ?p1 .
+    # const "669"^^xsd:integer < ?p1 
+    FILTER ( ?p1 > "669"^^xsd:integer ) 
+    ?localProduct bsbm:productPropertyNumeric3 ?p3 .
+    # const "710"^^xsd:integer > ?p3
+    FILTER (?p3 < "710"^^xsd:integer )
+    
+    OPTIONAL { 
+        # const!* not bsbm:ProductFeature26195
+        ?localProduct bsbm:productFeature ?localProductFeature2 .
+        ?localProductFeature2 owl:sameAs bsbm:ProductFeature26195 .
+        ?localProduct rdfs:label ?testVar 
+    }
+    FILTER (!bound(?testVar)) 
+}
+ORDER BY ?product ?label
+LIMIT 10

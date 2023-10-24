@@ -1,0 +1,42 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX bsbm: <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT DISTINCT ?product ?label ?propertyTextual WHERE {
+    { 
+        ?product rdfs:label ?label .
+        # const!* bsbm:ProductType433
+        ?product rdf:type ?localProductType .
+        ?localProductType owl:sameAs bsbm:ProductType433 .
+        # const!* bsbm:ProductFeature21348
+        ?product bsbm:productFeature ?localProductFeature1 .
+        ?localProductFeature1 owl:sameAs bsbm:ProductFeature21348.
+        # const** bsbm:ProductFeature22623 != bsbm:ProductFeature21348
+        ?product bsbm:productFeature ?localProductFeature2 .
+        ?localProductFeature2 owl:sameAs bsbm:ProductFeature22623.
+        ?product bsbm:productPropertyTextual1 ?propertyTextual .
+        ?product bsbm:productPropertyNumeric1 ?p1 .
+        # const** "699.0"^^xsd:double < ?p1
+        FILTER ( ?p1 > "699.0"^^xsd:double )
+    } UNION {
+        ?product rdfs:label ?label .
+        # const!* bsbm:ProductType433
+        ?product rdf:type ?localProductType .
+        ?localProductType owl:sameAs bsbm:ProductType433 .
+        # const!* bsbm:ProductFeature21348
+        ?product bsbm:productFeature ?localProductFeature1 .
+        ?localProductFeature1 owl:sameAs bsbm:ProductFeature21348 .
+        # const* bsbm:ProductFeature11785 != bsbm:ProductFeature22623, bsbm:ProductFeature21348
+        ?product bsbm:productFeature ?localProductFeature3 .
+        ?localProductFeature3 owl:sameAs bsbm:ProductFeature11785 .
+        ?product bsbm:productPropertyTextual1 ?propertyTextual .
+        ?product bsbm:productPropertyNumeric2 ?p2 .
+        # const "1069.0"^^xsd:double < ?p2
+        FILTER ( ?p2 > "1069.0"^^xsd:double ) 
+    } 
+}
+ORDER BY ?product ?label ?propertyTextual
+##OFFSET 5
+LIMIT 10

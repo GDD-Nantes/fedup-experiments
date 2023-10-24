@@ -30,7 +30,7 @@ public class HibiscusSourceSelectionPerformer extends SourceSelectionPerformer {
     }
     
     @Override
-    public List<Map<StatementPattern, List<StatementSource>>> performSourceSelection(String queryString, List<Map<String, String>> groundtruth) throws Exception {
+    public List<Map<StatementPattern, List<StatementSource>>> performSourceSelection(String queryString) throws Exception {
         logger.info("Source selection computed using HiBiSCuS");
         
         List<Endpoint> endpoints = connection.getEndpoints();

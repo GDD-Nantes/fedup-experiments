@@ -1,0 +1,28 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX bsbm-inst: <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/>
+PREFIX bsbm: <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT DISTINCT ?product ?label WHERE { 
+    ?product rdfs:label ?label .
+    
+    # const bsbm:ProductType282
+    ?product rdf:type ?localProductType .
+    ?localProductType owl:sameAs bsbm:ProductType282 .
+
+    # const bsbm:ProductFeature23911
+    ?product bsbm:productFeature ?localProductFeature1 . 
+    ?localProductFeature1 owl:sameAs bsbm:ProductFeature23911 .
+
+    # const bsbm:ProductFeature23846
+    ?product bsbm:productFeature ?localProductFeature2 . 
+    ?localProductFeature2 owl:sameAs bsbm:ProductFeature23846 .
+    ?product bsbm:productPropertyNumeric1 ?value1 . 
+    
+    # const "1003"^^xsd:integer < ?value1
+    FILTER (?value1 > "1003"^^xsd:integer) 
+}
+ORDER BY ?product ?label
+LIMIT 10
