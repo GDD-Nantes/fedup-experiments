@@ -84,7 +84,7 @@ def start_virtuoso(config, restart, home):
 
 
 @cli.command()
-@click.option("--config", type=click.Path(exists=True, dir_okay=False), default="virtuoso-opensource-7.2.11/var/lib/virtuoso/db/fedup.ini")
+@click.option("--config", type=click.Path(exists=True, dir_okay=False), default="virtuoso-opensource-7.2.7/var/lib/virtuoso/db/fedup.ini")
 @click.option("--soft/--kill", type=click.BOOL, default=True)
 def stop_virtuoso(config, soft):
     with open(config, "r") as file:

@@ -538,13 +538,13 @@ if "skipCompile" not in config:
         shell("mvn clean install")
 if "keepAlive" not in config:
     onsuccess:
-        shell(f"python commons.py stop-virtuoso {VIRTUOSO_HOME}/var/lib/virtuoso/db/fedup.ini")
-        shell(f"python commons.py stop-fuseki {FUSEKI_PORT}")
-        shell(f"python commons.py stop-fedup {FEDUP_PORT}")
+        shell(f"python commons.py stop-virtuoso --config {VIRTUOSO_HOME}/var/lib/virtuoso/db/fedup.ini")
+        shell(f"python commons.py stop-fuseki --port {FUSEKI_PORT}")
+        shell(f"python commons.py stop-fedup --port {FEDUP_PORT}")
     onerror:
-        shell(f"python commons.py stop-virtuoso {VIRTUOSO_HOME}/var/lib/virtuoso/db/fedup.ini")
-        shell(f"python commons.py stop-fuseki {FUSEKI_PORT}")
-        shell(f"python commons.py stop-fedup {FEDUP_PORT}")
+        shell(f"python commons.py stop-virtuoso --config {VIRTUOSO_HOME}/var/lib/virtuoso/db/fedup.ini")
+        shell(f"python commons.py stop-fuseki --port {FUSEKI_PORT}")
+        shell(f"python commons.py stop-fedup --port {FEDUP_PORT}")
 
 # import os
 # import json
