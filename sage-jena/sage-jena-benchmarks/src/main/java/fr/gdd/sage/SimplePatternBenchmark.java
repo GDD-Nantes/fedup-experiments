@@ -1,6 +1,6 @@
 package fr.gdd.sage;
 
-import fr.gdd.sage.datasets.Watdiv10M;
+import fr.gdd.sage.databases.persistent.Watdiv10M;
 import fr.gdd.sage.generics.Pair;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
@@ -28,7 +28,7 @@ import java.util.Optional;
 @Fork(2)
 @Measurement(iterations = 1)
 public class SimplePatternBenchmark {
-    static Logger log = LoggerFactory.getLogger(SimplePatternBenchmark.class);
+    final static Logger log = LoggerFactory.getLogger(SimplePatternBenchmark.class);
 
     @Param({EngineTypes.SageForceOrderTimeout1ms, EngineTypes.TDB, EngineTypes.Sage, EngineTypes.TDBForceOrder, EngineTypes.SageForceOrder,
             EngineTypes.SageForceOrderLimit1, EngineTypes.SageForceOrderTimeout1ms})

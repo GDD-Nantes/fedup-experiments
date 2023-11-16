@@ -1,0 +1,36 @@
+##DEFINE sql:select-option "order"
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX bsbm: <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT DISTINCT ?product ?localProductLabel WHERE { 
+    VALUES ( ?bgp1 ?bgp2 ) { ( <http://localhost:8890/sparql?default-graph-uri=http://www.vendor18.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.vendor6.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.vendor18.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite41.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.vendor18.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite32.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite72.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.vendor6.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite72.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite32.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite72.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite41.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite3.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite32.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite3.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.vendor6.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite3.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite41.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite59.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.vendor6.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite59.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite41.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite59.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite32.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite39.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite32.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite39.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.vendor6.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite39.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite41.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite77.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite32.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite77.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite41.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite77.fr> <http://localhost:8890/sparql?default-graph-uri=http://www.vendor6.fr> ) }
+
+    SERVICE ?bgp2 {
+        # const bsbm:Product166471
+        ?localProductXYZ owl:sameAs bsbm:Product166471  .
+        ?localProductXYZ bsbm:productFeature ?localProdFeatureXYZ . 
+        ?localProdFeatureXYZ owl:sameAs ?prodFeature .
+        ?localProductXYZ bsbm:productPropertyNumeric1 ?origProperty1  .
+        ?localProductXYZ bsbm:productPropertyNumeric2 ?origProperty2  .
+    } .
+
+    SERVICE ?bgp1 {
+        ?localProduct owl:sameAs ?product  .
+        FILTER (bsbm:Product166471 != ?product)        
+        ?localProduct rdfs:label ?localProductLabel  .
+        ?localProduct bsbm:productFeature ?localProdFeature  .
+        ?localProdFeature owl:sameAs ?prodFeature .
+        ?localProduct bsbm:productPropertyNumeric1 ?simProperty1  .
+        ?localProduct bsbm:productPropertyNumeric2 ?simProperty2  .    
+    } .
+
+    # Values are pre-determined because we knew the boundaries from the normal distribution
+    FILTER(?simProperty1 < (?origProperty1 + 20) && ?simProperty1 > (?origProperty1 - 20))
+    FILTER(?simProperty2 < (?origProperty2 + 70) && ?simProperty2 > (?origProperty2 - 70))
+
+}
+ORDER BY ?product ?localProductLabel
+LIMIT 5

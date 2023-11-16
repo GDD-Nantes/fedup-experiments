@@ -1,15 +1,10 @@
 package fr.gdd.sage;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
-import java.nio.file.Files;
-import java.util.*;
-
 import fr.gdd.sage.arq.OpExecutorSage;
 import fr.gdd.sage.arq.QueryEngineSage;
+import fr.gdd.sage.arq.SageConstants;
 import fr.gdd.sage.generics.Pair;
+import fr.gdd.sage.io.SageOutput;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.jena.base.Sys;
 import org.apache.jena.query.*;
@@ -19,21 +14,22 @@ import org.apache.jena.tdb2.TDB2Factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.gdd.sage.arq.SageConstants;
-import fr.gdd.sage.configuration.SageInputBuilder;
-import fr.gdd.sage.configuration.SageServerConfiguration;
-import fr.gdd.sage.io.SageInput;
-import fr.gdd.sage.io.SageOutput;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Aims to ease the simple execution of a query from start to finish
  * despite pause/resume.
  **/
 public class ExecuteUtils {
-    static Logger log = LoggerFactory.getLogger(ExecuteUtils.class);
+    final static Logger log = LoggerFactory.getLogger(ExecuteUtils.class);
 
     static Integer expectedNumResults = null;
 
+    static Set<String> solutions = null;
 
     /**
      * Execute a parsed query on a dataset until all results are produced.
@@ -41,7 +37,7 @@ public class ExecuteUtils {
      * @param query The query to execute on the dataset.
      * @param withSerialize An optional serialization parameter that state whether time for serialize should be
      *                      included or not.
-     * @return A pair <number of results, number of pauses>
+     * @return A pair (number of results, number of pauses)
      */
     public static Pair<Long, Long> executeQueryTillTheEnd(Dataset dataset, Query query, boolean... withSerialize) {
         long nbPreempt = -1; // the first execution is not a preempt
@@ -50,6 +46,10 @@ public class ExecuteUtils {
 
         Map<Integer, Serializable> state = Map.of();
         byte[] serialized = null;
+        Map<Integer, Serializable> previousState = null;
+
+        //Set<String> preparingSolutions = new HashSet<>();
+
         while (Objects.isNull(results)|| (!Objects.isNull(results.getState()))) {
             nbPreempt += 1;
 
@@ -70,14 +70,36 @@ public class ExecuteUtils {
                 e.printStackTrace();
             }
 
+            // ResultSet result_set = new ResultSetSage(qe.execSelect());
             ResultSet result_set = qe.execSelect();
+
             while (result_set.hasNext()) { // must enumerate to actually execute
                 QuerySolution solution = result_set.next();
+                // System.out.println(solution);
+                /*if (Objects.nonNull(solutions)) {
+                    if (!solutions.contains(solution.toString())) {
+                        results = qe.getContext().get(SageConstants.output);
+                        state = (Map) results.getState();
+                        System.out.println(state);
+                        System.out.println("WRONG = " + solution.toString() );
+                        throw new RuntimeException("WRONG");
+                    }
+                }*/
+                /*if (preparingSolutions.contains(solution.toString())) {
+                    results = qe.getContext().get(SageConstants.output);
+                    state = (Map) results.getState();
+                    System.out.println(state);
+                    System.out.println("DOUBLON = " + solution.toString() );
+                    throw new RuntimeException("DOUBLON");
+                }
+                preparingSolutions.add(solution.toString());*/
+
                 sum += 1;
             }
             log.debug("Got {} results so far…" , sum);
 
             results = qe.getContext().get(SageConstants.output);
+            // System.out.println(results.getState());
 
             if (Objects.nonNull(withSerialize) && withSerialize.length > 0 && withSerialize[0]) {
                 serialized = SerializationUtils.serialize(results);
@@ -85,8 +107,17 @@ public class ExecuteUtils {
             state = (Map) results.getState();
             qe.close();
 
+            if (Objects.nonNull(state) && state.equals(previousState)) {
+                System.out.println(":{");
+            }
+
             log.debug("Saved state {}", results.getState());
         }
+
+
+        /*if (Objects.isNull(solutions)) {
+            solutions = preparingSolutions;
+        }*/
 
         return new Pair<>(sum, nbPreempt);
     }
@@ -97,7 +128,7 @@ public class ExecuteUtils {
      * @param query The query to execute on the dataset.
      * @param withSerialize An optional serialization parameter that state whether time for serialize should be
      *                      included or not.
-     * @return A pair <number of results, number of pauses>
+     * @return A pair (number of results, number of pauses)
      */
     public static Pair<Long, Long> executeTillTheEnd(Dataset dataset, String query, boolean... withSerialize) {
         Query q = QueryFactory.create(query);
@@ -108,7 +139,7 @@ public class ExecuteUtils {
      * Execute a query represented as a string on a TDB2 dataset with a TDB2 query engine.
      * @param dataset The dataset to execute on.
      * @param query The query to execute on the dataset.
-     * @return A pair <number of results, 0>, since the number of pause is always 0.
+     * @return A pair (number of results, 0), since the number of pause is always 0.
      */
     public static Pair<Long, Long> executeTDB(Dataset dataset, String query) {
         QueryExecution queryExecution = null;
@@ -125,7 +156,7 @@ public class ExecuteUtils {
         ResultSet rs = queryExecution.execSelect() ;
         while (rs.hasNext()) {
             rs.next();
-            nbResults+=1;
+            nbResults += 1;
         }
 
         log.debug("Got {} results for this query.", nbResults);

@@ -1,6 +1,6 @@
 package fr.gdd.sage;
 
-import fr.gdd.sage.datasets.Watdiv10M;
+import fr.gdd.sage.databases.persistent.Watdiv10M;
 import fr.gdd.sage.generics.Pair;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
 public class WatdivBenchmark {
-    static Logger log = LoggerFactory.getLogger(WatdivBenchmark.class);
+    final static Logger log = LoggerFactory.getLogger(WatdivBenchmark.class);
 
     static HashMap<String, Long> nbResultsPerQuery = new HashMap<>();
 
@@ -88,23 +88,23 @@ public class WatdivBenchmark {
     public static void main(String[] args) throws RunnerException {
         Optional<String> dirPath_opt = (args.length > 0) ? Optional.of(args[0]) : Optional.empty();
 
-        Watdiv10M watdiv = new Watdiv10M(dirPath_opt); // creates the db if need be
+        Watdiv10M watdiv = new Watdiv10M(Optional.of("datasets")); // creates the db if need be
 
         // create all the runners' options
-        List<Options> options = createOptions(watdiv, List.of(QueryTypes.Short),
+        List<Options> options = createOptions(watdiv, List.of(QueryTypes.Long),
                 // EngineTypes.TDB
                 // EngineTypes.Sage,
-                EngineTypes.TDBForceOrder,
+                // EngineTypes.TDBForceOrder,
                 // EngineTypes.SageForceOrder,
-                EngineTypes.SageForceOrderTimeout1ms,
-                EngineTypes.SageForceOrderTimeout1s,
-                EngineTypes.SageForceOrderTimeout30s
-                //EngineTypes.SageForceOrderTimeout60s);
+                // EngineTypes.SageForceOrderTimeout1ms
+                //EngineTypes.SageForceOrderTimeout1s,
+                // EngineTypes.SageForceOrderTimeout30s
+                EngineTypes.SageForceOrderTimeout60s
         );
 
         // testing only one query
-        options = customsOptions(watdiv, "sage-jena-benchmarks/queries/watdiv_with_sage_plan/query_10020.sparql",
-                EngineTypes.SageForceOrderTimeout1ms);
+        // options = customsOptions(watdiv, "sage-jena-benchmarks/queries/watdiv_with_sage_plan/query_10020.sparql",
+        //        EngineTypes.SageForceOrderTimeout1ms);
                 // EngineTypes.TDB);*/
 
         for (Options opt : options) {

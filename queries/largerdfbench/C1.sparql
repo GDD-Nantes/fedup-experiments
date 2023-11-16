@@ -1,0 +1,14 @@
+SELECT DISTINCT ?drug ?drugDesc ?molecularWeightAverage ?compound ?ReactionTitle ?ChemicalEquation WHERE {
+    ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugType> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugtype/smallMolecule> .
+    # ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/description> ?drugDesc .
+    ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/keggCompoundId> ?compound . 
+    ?enzyme <http://bio2rdf.org/ns/kegg#xSubstrate> ?compound .
+    ?Chemicalreaction <http://bio2rdf.org/ns/kegg#xEnzyme> ?enzyme .
+    ?Chemicalreaction <http://bio2rdf.org/ns/kegg#equation> ?ChemicalEquation .
+    ?Chemicalreaction <http://purl.org/dc/elements/1.1/title> ?ReactionTitle .
+    OPTIONAL { 
+        ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/molecularWeightAverage> ?molecularWeightAverage .
+        FILTER (?molecularWeightAverage > 114) .
+    }
+}
+LIMIT 1000

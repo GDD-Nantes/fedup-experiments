@@ -1,0 +1,7 @@
+SELECT ?drug ?intDrug ?intEffect WHERE {
+    ?drug <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Drug> .
+    ?y <http://www.w3.org/2002/07/owl#sameAs> ?drug .
+    ?int <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/interactionDrug1> ?y .
+    ?int <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/interactionDrug2> ?intDrug .
+    ?int <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/text> ?intEffect . 
+}

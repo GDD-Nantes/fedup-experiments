@@ -1,0 +1,11 @@
+SELECT ?name ?location WHERE {
+    SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/geonames> {
+        ?germany <http://www.geonames.org/ontology#name> "Federal Republic of Germany" .
+        ?location <http://www.geonames.org/ontology#parentFeature> ?germany .
+
+    }
+    SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/jamendo> {
+        ?artist <http://xmlns.com/foaf/0.1/based_near> ?location .
+        ?artist <http://xmlns.com/foaf/0.1/name> ?name .
+    }
+}

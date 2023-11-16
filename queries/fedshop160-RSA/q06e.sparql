@@ -1,0 +1,14 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX bsbm: <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT ?localProduct ?label WHERE {
+    VALUES ( ?bgp1 ) { ( <http://localhost:8890/sparql?default-graph-uri=http://www.vendor17.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite15.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite30.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite36.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite39.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite57.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite58.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite64.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite18.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite19.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite31.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite9.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite10.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite41.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite48.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite66.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite13.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite28.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite70.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.vendor6.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite54.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite62.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite71.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.vendor62.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite61.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite76.fr> ) }
+    SERVICE ?bgp1 {
+        ?localProduct rdfs:label ?label .
+        ?localProduct rdf:type bsbm:Product .
+        # const "avogadro" in ?label 
+        FILTER regex(lcase(str(?label)), "avogadro")
+    }
+}

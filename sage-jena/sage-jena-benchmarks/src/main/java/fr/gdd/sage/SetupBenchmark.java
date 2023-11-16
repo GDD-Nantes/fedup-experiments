@@ -29,7 +29,6 @@ public class SetupBenchmark {
         volatile String query = null;
     }
 
-
     public static void setup(BenchmarkExecutionContext context, String dbPath, String engine) throws Exception {
         context.dataset = TDB2Factory.connectDataset(dbPath);
         if (!context.dataset.isInTransaction()) {

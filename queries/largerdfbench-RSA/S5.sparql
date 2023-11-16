@@ -1,0 +1,10 @@
+SELECT ?film ?director ?genre WHERE {
+    SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/dbpedia> {
+        ?film <http://dbpedia.org/ontology/director>  ?director .
+        ?director <http://dbpedia.org/ontology/nationality> <http://dbpedia.org/resource/Italy> .
+    }
+    SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/lmdb> {
+        ?x <http://www.w3.org/2002/07/owl#sameAs> ?film .
+        ?x <http://data.linkedmdb.org/resource/movie/genre> ?genre .
+    }
+}

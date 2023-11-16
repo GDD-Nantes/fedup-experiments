@@ -1,7 +1,6 @@
 package org.apache.jena.sparql.engine.iterator;
 
 import fr.gdd.sage.arq.SageConstants;
-import fr.gdd.sage.arq.ScanIteratorFactory;
 import fr.gdd.sage.interfaces.BackendIterator;
 import fr.gdd.sage.io.SageInput;
 import fr.gdd.sage.io.SageOutput;
@@ -9,12 +8,14 @@ import fr.gdd.sage.jena.PreemptTupleTable;
 import fr.gdd.sage.jena.SerializableRecord;
 import org.apache.jena.atlas.lib.tuple.Tuple;
 import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.ExecutionContext;
 import org.apache.jena.tdb2.store.DatasetGraphTDB;
 import org.apache.jena.tdb2.store.NodeId;
 import org.apache.jena.tdb2.store.nodetable.NodeTable;
 import org.apache.jena.tdb2.store.nodetupletable.NodeTupleTable;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
 
@@ -49,7 +50,7 @@ public class PreemptScanIteratorFactory implements ScanIteratorFactory {
     }
     
     public Iterator<Quad> getScan(Tuple<NodeId> pattern, Integer id) {
-        BackendIterator<NodeId, SerializableRecord> wrapped = null;
+        BackendIterator<NodeId, Serializable> wrapped = null;
         PreemptScanIteratorQuad volcanoIterator = null;
         if (pattern.len() < 4) {
             wrapped = preemptTripleTupleTable.preemptFind(pattern);
@@ -66,8 +67,8 @@ public class PreemptScanIteratorFactory implements ScanIteratorFactory {
         return volcanoIterator;
     }
 
-    public Iterator<Tuple<NodeId>> getScan(NodeTupleTable nodeTupleTable, Tuple<NodeId> pattern, Integer id) {
-        BackendIterator<NodeId, SerializableRecord> wrapped = null;
+    public Iterator<Tuple<NodeId>> getScan(NodeTupleTable nodeTupleTable, Tuple<NodeId> pattern, Var[] vars, Integer id) {
+        BackendIterator<NodeId, Serializable> wrapped = null;
         PreemptScanIteratorTupleId volcanoIterator = null;
         if (pattern.len() < 4) {
             wrapped = preemptTripleTupleTable.preemptFind(pattern);

@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.fluidops.fedx.*;
+import fr.univnantes.gdd.fedup.sourceselection.UoJvsJoU;
 import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
@@ -30,9 +31,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fluidops.fedx.Config;
-import com.fluidops.fedx.FedXFactory;
-import com.fluidops.fedx.Util;
 import com.fluidops.fedx.algebra.StatementSource;
 import com.fluidops.fedx.sail.FedXSailRepository;
 
@@ -41,13 +39,12 @@ import fr.gdd.sage.arq.QueryEngineSage;
 import fr.gdd.sage.arq.SageConstants;
 import fr.univnantes.gdd.fedup.Spy;
 import fr.univnantes.gdd.fedup.Utils;
-import fr.univnantes.gdd.fedup.sourceselection.SourceAssignments;
 import fr.univnantes.gdd.fedup.sourceselection.SourceSelectionPerformer;
 
 @RestController
 public class FedUPController {
 
-	private static Logger logger = LogManager.getLogger(FedUPController.class);
+	private static final Logger logger = LogManager.getLogger(FedUPController.class);
 
 	private List<String> loadEndpoints(String fileName) throws IOException {
         Path filePath = Path.of(fileName);
@@ -59,46 +56,53 @@ public class FedUPController {
 		public Spy onFedQuery(
 		@RequestBody InputParameters parameters
 	) throws Exception {
-		List<String> endpoints;
-		try {
-			endpoints = this.loadEndpoints(parameters.endpointsFileName);
-		} catch (IOException exception) {
-			logger.error("Error when loading endpoints: " + exception);
-			return null;
-		}
+		Spy.reset(); // to avoid cumulating metrics of previous runs
 
-		Spy spy = new Spy();
+		long startTime = System.currentTimeMillis();
+
 		Config config = new Config(parameters.configFileName);
 
-		FedXSailRepository repository = FedXFactory.initializeSparqlFederation(config, endpoints);
+		FedXSailRepository repository = FedXFactory.initializeSparqlFederation(config, parameters.endpoints);
 		SailRepositoryConnection connection = repository.getConnection();
             
 		SourceSelectionPerformer sourceSelectionPerformer = (SourceSelectionPerformer) Util.instantiate(
 			config.getProperty("fedup.sourceSelectionClass"), connection);
 
 		List<Map<StatementPattern, List<StatementSource>>> assignments;
-		assignments = sourceSelectionPerformer.performSourceSelection(parameters.queryString, parameters.assignments, spy);
+		assignments = sourceSelectionPerformer.performSourceSelection(parameters.queryString);
 
-		spy.tpwss = Utils.computeTPWSS(assignments);
+		// new PrintQueryPlans((FedXConnection) connection.getSailConnection()).print(parameters.queryString, assignments);
+
+		Spy.getInstance().tpwss = Utils.computeTPWSS(assignments);
 
 		// logger.debug("Assignments: " + assignments);
 
-		SourceAssignments sourceSelection = SourceAssignments.getInstance();
-		Collections.shuffle(assignments);
-		sourceSelection.setAssignments(assignments);
-		
+		// global assign so FedX can pick its source assignments one by one afterward
+		// SourceAssignments sourceSelection = SourceAssignments.getInstance();
+		// Collections.shuffle(assignments);
+		// sourceSelection.setAssignments(assignments);
+
+		// (TODO) RDF4J does not support values
+		// (TODO) ugly testing by quickly removing the values
+		// String queryString = parameters.queryString.replaceAll("(VALUES|values).*", "");
+		String queryString = parameters.queryString;
+		System.out.println(queryString);
 		if (parameters.runQuery) {
 			FedUPQueryExecutor executor = new FedUPQueryExecutor(connection);
-			executor.execute(parameters.queryString, sourceSelection, spy);
+			executor.execute(queryString, assignments);
 		}
 
-		logger.info("Source Selection Time: " + spy.sourceSelectionTime + "ms");
-		logger.info("Execution Time: " + spy.executionTime + "ms");
+		logger.info("Source Selection Time: " + Spy.getInstance().sourceSelectionTime + "ms");
+		logger.info("Execution Time: " + Spy.getInstance().executionTime + "ms");
 
 		connection.close();
 		repository.shutDown();
 
-		return spy;
+		long endTime = System.currentTimeMillis();
+
+		Spy.getInstance().runtime = endTime - startTime;
+
+		return Spy.getInstance();
 	}
 
 	@GetMapping("/sparql")

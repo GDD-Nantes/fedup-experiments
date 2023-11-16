@@ -1,0 +1,14 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX bsbm: <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT ?localProduct ?label WHERE {
+    VALUES ( ?bgp1 ) { ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite3.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.vendor19.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite20.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite36.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite6.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite10.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite14.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite5.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite18.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite25.fr> ) }
+    SERVICE ?bgp1 {
+        ?localProduct rdfs:label ?label .
+        ?localProduct rdf:type bsbm:Product .
+        # const "pyrenees" in ?label 
+        FILTER regex(lcase(str(?label)), "pyrenees")
+    }
+}

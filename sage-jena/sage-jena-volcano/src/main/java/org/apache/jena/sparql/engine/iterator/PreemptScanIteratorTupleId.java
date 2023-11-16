@@ -1,8 +1,10 @@
 package org.apache.jena.sparql.engine.iterator;
 
+import fr.gdd.sage.arq.IdentifierLinker;
 import fr.gdd.sage.arq.SageConstants;
 import fr.gdd.sage.generics.Pair;
 import fr.gdd.sage.interfaces.BackendIterator;
+import fr.gdd.sage.interfaces.PreemptIterator;
 import fr.gdd.sage.io.SageInput;
 import fr.gdd.sage.io.SageOutput;
 import fr.gdd.sage.jena.SerializableRecord;
@@ -11,17 +13,23 @@ import org.apache.jena.dboe.trans.bplustree.PreemptJenaIterator;
 import org.apache.jena.sparql.engine.ExecutionContext;
 import org.apache.jena.tdb2.store.NodeId;
 import org.apache.jena.tdb2.store.nodetable.NodeTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Objects;
+import java.util.Set;
 
 /**
  * A Volcano Iterator that works on {@link Tuple<NodeId>} instead of
  * {@link  org.apache.jena.sparql.core.Quad}. They are supposedly more efficient.
  */
-public class PreemptScanIteratorTupleId implements Iterator<Tuple<NodeId>> {
+public class PreemptScanIteratorTupleId implements Iterator<Tuple<NodeId>>, PreemptIterator<SerializableRecord> {
 
-    public BackendIterator<NodeId, SerializableRecord> wrapped;
+    private static Logger log = LoggerFactory.getLogger(PreemptScanIteratorTupleId.class);
+
+    public BackendIterator<NodeId, Serializable> wrapped;
     NodeTable nodeTable;
 
     SageInput<?>  input;
@@ -33,7 +41,7 @@ public class PreemptScanIteratorTupleId implements Iterator<Tuple<NodeId>> {
     ExecutionContext context;
 
 
-    public PreemptScanIteratorTupleId(BackendIterator<NodeId, SerializableRecord> wrapped, NodeTable nodeTable,
+    public PreemptScanIteratorTupleId(BackendIterator<NodeId, Serializable> wrapped, NodeTable nodeTable,
                                       SageInput<?> input, SageOutput<?> output, Integer id, ExecutionContext context) {
         this.wrapped = wrapped;
         this.nodeTable = nodeTable;
@@ -41,6 +49,9 @@ public class PreemptScanIteratorTupleId implements Iterator<Tuple<NodeId>> {
         this.output = output;
         this.id = id;
         this.context = context;
+
+        HashMap<Integer, PreemptIterator> iterators = context.getContext().get(SageConstants.iterators);
+        iterators.put(id, this);
     }
 
     /**
@@ -52,44 +63,87 @@ public class PreemptScanIteratorTupleId implements Iterator<Tuple<NodeId>> {
         this.input = input;
         this.output = output;
         this.id = id;
+
+        HashMap<Integer, PreemptIterator> iterators = context.getContext().get(SageConstants.iterators);
+        iterators.put(id, this);
     }
 
     @Override
     public boolean hasNext() {
-        boolean someoneStartedSaving = Objects.nonNull(output.getState()) && !output.getState().isEmpty();
-        if (someoneStartedSaving ||
-                (!first && (System.currentTimeMillis() >= input.getDeadline() || output.size() >= input.getLimit()))) {
-            if (Objects.nonNull(this.output.getState()) && (this.output.getState().containsKey(id))) {
-                // no saving since a priority id already saved its state.
-                // for instance, in union (bgp 1) (bgp 2), when bgp1 saves and returns false, bgp2 will also
-                // call its hasNext(), and try to save, with an identical identifier.
-                // we want that every part of the union returns false + only the first saver saves.
-                return false;
+        boolean result = wrapped.hasNext();
+
+        if (result) {
+            if (!first &&
+                    System.currentTimeMillis() >= input.getDeadline() || output.size() >= input.getLimit()) {
+                // saving
+                HashMap<Integer, PreemptIterator> iterators = context.getContext().get(SageConstants.iterators);
+                IdentifierLinker identifiers = context.getContext().get(SageConstants.identifiers);
+                Set<Integer> parents = identifiers.getParents(getId());
+                log.debug("@{}", id);
+                for (Integer parent : parents) {
+                    if (!iterators.containsKey(parent)) {
+                        // in OPT, the iterator may not exist (because it fails beforehand) while being
+                        // a parent of downstream iterator. When it does not exist, we do not save anything
+                        // since previous iterator will fail on resume as well.
+                        log.debug("SKIP {}", parent);
+                        continue;
+                    }
+                    if (identifiers.inRightSideOf(parent, id)) {
+                        log.debug("SAVE CURRENT {}", parent);
+                        Pair toSave = new Pair(parent, iterators.get(parent).current());
+                        this.output.addState(toSave);
+                    } else {
+                        log.debug("SAVE PREVIOUS {}", parent);
+                        Pair toSave = new Pair(parent, iterators.get(parent).previous());
+                        this.output.addState(toSave);
+                    }
+                }
+                this.output.addState(new Pair(getId(), current()));
+                // execution stops immediately, caught by {@link PreemptRootIter}
+                throw new PauseException();
             }
-
-            // The first of all ids is the one to save its current
-            boolean shouldSaveCurrent = Objects.isNull(this.output.getState()) ||
-                    this.output.getState().keySet().stream().noneMatch(k -> k > id);
-
-            Pair toSave = new Pair(id, shouldSaveCurrent ? this.wrapped.current() : this.wrapped.previous());
-            this.output.addState(toSave);
-            return false;
+            return true; // always true
         }
-        first = false;
 
-        return wrapped.hasNext();
+        if (!result) {
+            // we unregister the iterator to make sure it's not saved
+            HashMap<Integer, PreemptIterator> iterators = context.getContext().get(SageConstants.iterators);
+            iterators.remove(id);
+        }
+
+        // when false, there is no chance that we save at this point
+        return false;
     }
 
     @Override
     public Tuple<NodeId> next() {
-        context.getContext().set(SageConstants.cursor, id);
+        first = false;
 
+        context.getContext().set(SageConstants.cursor, id);
         wrapped.next();
         return ((PreemptJenaIterator) wrapped).getCurrentTuple();
     }
 
+    /* ******************************************************************************* */
+
+    @Override
+    public Integer getId() {
+        return this.id;
+    }
+
+    @Override
     public void skip(SerializableRecord to) {
         first = true; // skip so first `hasNext` is mandatory
         wrapped.skip(to);
+    }
+
+    @Override
+    public SerializableRecord current() {
+        return (SerializableRecord) wrapped.current();
+    }
+
+    @Override
+    public SerializableRecord previous() {
+        return (SerializableRecord) wrapped.previous();
     }
 }

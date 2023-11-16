@@ -1,0 +1,12 @@
+PREFIX bsbm: <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/>
+
+SELECT DISTINCT ?property ?hasValue ?isValueOf WHERE {
+    VALUES ( ?bgp1 ) { ( <http://localhost:8890/sparql?default-graph-uri=http://www.vendor0.fr> ) }
+    SERVICE ?bgp1 {
+        # const <http://www.vendor0.fr/Offer524>
+        <http://www.vendor0.fr/Offer524> bsbm:product ?product . 
+        { <http://www.vendor0.fr/Offer524> ?property ?hasValue }
+        UNION
+        { ?isValueOf ?property <http://www.vendor0.fr/Offer524> }
+    }
+}

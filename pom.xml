@@ -13,17 +13,18 @@
     <packaging>pom</packaging>
 
     <properties>
-		<jdk.version>20</jdk.version>
+		<jdk.version>21</jdk.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
-        <skipTests>True</skipTests>
+        <skipTests>true</skipTests>
 	</properties>
 
     <modules>
         <module>costfed</module>
         <module>fedx</module>
-        <module>fedup</module>
         <module>sage-jena</module>
+        <module>raw-jena</module>
+        <module>fedup</module>
     </modules>
 
     <build>

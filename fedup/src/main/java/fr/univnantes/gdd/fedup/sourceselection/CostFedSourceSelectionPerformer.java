@@ -23,14 +23,14 @@ import fr.univnantes.gdd.fedup.Utils;
 
 public class CostFedSourceSelectionPerformer extends SourceSelectionPerformer {
 
-    private static Logger logger = LogManager.getLogger(CostFedSourceSelectionPerformer.class);
+    private static final Logger logger = LogManager.getLogger(CostFedSourceSelectionPerformer.class);
 
     public CostFedSourceSelectionPerformer(SailRepositoryConnection connection) {
         super(connection);
     }
 
     @Override
-    public List<Map<StatementPattern, List<StatementSource>>> performSourceSelection(String queryString, List<Map<String, String>> groundtruth, Spy spy) throws Exception {
+    public List<Map<StatementPattern, List<StatementSource>>> performSourceSelection(String queryString) throws Exception {
         logger.info("Source selection computed using CostFed");
         
         List<Endpoint> endpoints = connection.getEndpoints();
@@ -39,24 +39,21 @@ public class CostFedSourceSelectionPerformer extends SourceSelectionPerformer {
 
         cache.clear();
 
-        SourceSelection sourceSelection = new SourceSelection(endpoints, cache, queryInfo, spy);
+        SourceSelection sourceSelection = new SourceSelection(endpoints, cache, queryInfo);
 
         long startTime = System.currentTimeMillis();
         sourceSelection.performSourceSelection(Utils.getBasicGraphPatterns(queryString));
         long endTime = System.currentTimeMillis();
 
-        spy.sourceSelectionTime = endTime - startTime;
-        
+        Spy.getInstance().sourceSelectionTime = endTime - startTime;
+
         return List.of(sourceSelection.getStmtToSources());
     }
  
-    private class SourceSelection extends TBSSSourceSelection {
+    private static class SourceSelection extends TBSSSourceSelection {
 
-        private Spy spy;
-
-        public SourceSelection(List<Endpoint> endpoints, Cache cache, QueryInfo queryInfo, Spy spy) {
+        public SourceSelection(List<Endpoint> endpoints, Cache cache, QueryInfo queryInfo) {
             super(endpoints, cache, queryInfo);
-            this.spy = spy;
         }
         
         @Override
@@ -70,7 +67,7 @@ public class CostFedSourceSelectionPerformer extends SourceSelectionPerformer {
                     addSource(stmt, new StatementSource(endpoint.getId(), StatementSourceType.REMOTE));
                 } else if (assurance == StatementSourceAssurance.POSSIBLY_HAS_STATEMENTS) {
                     remoteCheckTasks.add(new CheckTaskPair(endpoint, stmt));
-                    spy.numASKQueries += 1;
+                    Spy.getInstance().numASKQueries += 1;
                 }
             }
         }

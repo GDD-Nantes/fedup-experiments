@@ -3,6 +3,7 @@ package fr.univnantes.gdd.fedup.summary;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
+import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.core.Quad;
 
 public abstract class Summarizer {
@@ -16,5 +17,7 @@ public abstract class Summarizer {
     public abstract Quad summarize(Quad quad);
 
     public abstract Query summarize(Query query);
+
+    public abstract Op summarize(Op op);
 
 }

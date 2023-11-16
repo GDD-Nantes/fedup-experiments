@@ -1,5 +1,6 @@
 package org.apache.jena.sparql.engine.iterator;
 
+import fr.gdd.sage.arq.IdentifierAllocator;
 import fr.gdd.sage.arq.SageConstants;
 import fr.gdd.sage.io.SageInput;
 import fr.gdd.sage.io.SageOutput;
@@ -46,12 +47,20 @@ public class PreemptQueryIterUnion extends QueryIterUnion {
         Integer skipToOffset = skipCreatingIterators;
 
         PreemptQueryIterConcat unionQIter = new PreemptQueryIterConcat(getExecContext(), id);
+        IdentifierAllocator a = new IdentifierAllocator(id);
         for (Op subOp : subOps) {
             if (skipCreatingIterators > 0) {
                 skipCreatingIterators -= 1;
+
+                // We process the identifiers allocated to the subOp still, so every branch
+                // of the union has its own range of identifiers.
+                subOp.visit(a);
                 continue;
             }
+            getExecContext().getContext().set(SageConstants.cursor, a.getCurrent());
+
             subOp = QC.substitute(subOp, binding);
+            subOp.visit(a);
             QueryIterator parent = QueryIterSingleton.create(binding, getExecContext());
             QueryIterator qIter = QC.execute(subOp, parent, getExecContext());
             unionQIter.add(qIter);

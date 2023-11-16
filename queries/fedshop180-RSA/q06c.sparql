@@ -1,0 +1,14 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX bsbm: <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT ?localProduct ?label WHERE {
+    VALUES ( ?bgp1 ) { ( <http://localhost:8890/sparql?default-graph-uri=http://www.vendor28.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.vendor1.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite52.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite51.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite58.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite67.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite66.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite44.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite35.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite11.fr> ) ( <http://localhost:8890/sparql?default-graph-uri=http://www.ratingsite81.fr> ) }
+    SERVICE ?bgp1 {
+        ?localProduct rdfs:label ?label .
+        ?localProduct rdf:type bsbm:Product .
+        # const "fantastically" in ?label 
+        FILTER regex(lcase(str(?label)), "fantastically")
+    }
+}

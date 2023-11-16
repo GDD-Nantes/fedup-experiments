@@ -1,6 +1,0 @@
-#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu Apr 13 20:19:36 CEST 2023
-https\://repo.jenkins-ci.org/public/.error=
-https\://repo.jenkins-ci.org/public/.lastUpdated=1681409976064
-https\://repo1.maven.org/maven2/.error=
-https\://repo1.maven.org/maven2/.lastUpdated=1681409975228

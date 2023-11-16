@@ -1,0 +1,17 @@
+SELECT ?location ?news WHERE {
+    {
+        SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/geonames> {
+            ?location <http://www.geonames.org/ontology#parentFeature> ?parent .
+            ?parent <http://www.geonames.org/ontology#name> "California" .
+        }
+    } UNION {
+        SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/nyt> {
+            ?location <http://www.geonames.org/ontology#parentFeature> ?parent .
+            ?parent <http://www.geonames.org/ontology#name> "California" .
+        }
+    }
+    SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/nyt> {
+        ?y <http://www.w3.org/2002/07/owl#sameAs> ?location .
+        ?y <http://data.nytimes.com/elements/topicPage> ?news .
+    }
+}

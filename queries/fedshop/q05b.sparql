@@ -1,0 +1,30 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX bsbm: <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT DISTINCT ?product ?localProductLabel WHERE { 
+    ?localProduct rdfs:label ?localProductLabel .
+    
+    ?localProduct bsbm:productFeature ?localProdFeature .
+    ?localProduct bsbm:productPropertyNumeric1 ?simProperty1 .
+    ?localProduct bsbm:productPropertyNumeric2 ?simProperty2 .    
+
+    ?localProduct owl:sameAs ?product .
+    ?localProdFeature owl:sameAs ?prodFeature .
+
+    ?localProductXYZ bsbm:productFeature ?localProdFeatureXYZ .
+    ?localProductXYZ bsbm:productPropertyNumeric1 ?origProperty1 .
+    ?localProductXYZ bsbm:productPropertyNumeric2 ?origProperty2 .
+
+    # const bsbm:Product43923
+    ?localProductXYZ owl:sameAs bsbm:Product43923 .
+    ?localProdFeatureXYZ owl:sameAs ?prodFeature .
+
+    FILTER(bsbm:Product43923 != ?product)
+    # Values are pre-determined because we knew the boundaries from the normal distribution
+    FILTER(?simProperty1 < (?origProperty1 + 20) && ?simProperty1 > (?origProperty1 - 20))
+    FILTER(?simProperty2 < (?origProperty2 + 70) && ?simProperty2 > (?origProperty2 - 70))
+}
+ORDER BY ?product ?localProductLabel
+LIMIT 5

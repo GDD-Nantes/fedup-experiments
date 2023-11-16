@@ -1,9 +1,12 @@
 package fr.univnantes.gdd.fedup.sourceselection;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import org.aksw.simba.quetsal.core.HibiscusSourceSelection;
+import org.apache.jena.sparql.pfunction.library.version;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.rdf4j.query.algebra.StatementPattern;
@@ -23,14 +26,14 @@ import fr.univnantes.gdd.fedup.Utils;
 
 public class HibiscusSourceSelectionPerformer extends SourceSelectionPerformer {
 
-    private static Logger logger = LogManager.getLogger(HibiscusSourceSelectionPerformer.class);
+    private static final Logger logger = LogManager.getLogger(HibiscusSourceSelectionPerformer.class);
 
     public HibiscusSourceSelectionPerformer(SailRepositoryConnection connection) {
         super(connection);
     }
     
     @Override
-    public List<Map<StatementPattern, List<StatementSource>>> performSourceSelection(String queryString, List<Map<String, String>> groundtruth, Spy spy) throws Exception {
+    public List<Map<StatementPattern, List<StatementSource>>> performSourceSelection(String queryString) throws Exception {
         logger.info("Source selection computed using HiBiSCuS");
         
         List<Endpoint> endpoints = connection.getEndpoints();
@@ -39,24 +42,37 @@ public class HibiscusSourceSelectionPerformer extends SourceSelectionPerformer {
 
         cache.clear();
 
-        SourceSelection sourceSelection = new SourceSelection(endpoints, cache, queryInfo, spy);
+        SourceSelection sourceSelection = new SourceSelection(endpoints, cache, queryInfo);
 
         long startTime = System.currentTimeMillis();
         sourceSelection.performSourceSelection(Utils.getBasicGraphPatterns(queryString));
         long endTime = System.currentTimeMillis();
 
-        spy.sourceSelectionTime = endTime - startTime;
+        Spy.getInstance().sourceSelectionTime = endTime - startTime;
+        
+        List<Map<String, String>> assignments = new ArrayList<>() ;
 
-        return List.of(sourceSelection.getStmtToSources());
+        Map<StatementPattern, List<StatementSource>> sourceAssignments = sourceSelection.getStmtToSources();
+
+        for (StatementPattern tp: sourceAssignments.keySet()) {
+            List<StatementSource> sources = sourceAssignments.get(tp);
+            for (StatementSource source: sources) {
+                Map<String, String> assingment = new HashMap<>();
+                assingment.put(tp.toString(), source.toString());
+                assignments.add(assingment);
+            }
+        }
+
+        Spy.getInstance().assignments = assignments;
+        Spy.getInstance().numAssignments = assignments.size();
+
+        return List.of(sourceAssignments);
     }
 
-    private class SourceSelection extends HibiscusSourceSelection {
+    private static class SourceSelection extends HibiscusSourceSelection {
 
-        private Spy spy;
-
-        public SourceSelection(List<Endpoint> endpoints, Cache cache, QueryInfo queryInfo, Spy spy) {
+        public SourceSelection(List<Endpoint> endpoints, Cache cache, QueryInfo queryInfo) {
             super(endpoints, cache, queryInfo);
-            this.spy = spy;
         }
 
         @Override
@@ -75,7 +91,7 @@ public class HibiscusSourceSelectionPerformer extends SourceSelectionPerformer {
                     addSource(stmt, new StatementSource(endpoint.getId(), StatementSourceType.REMOTE));
                 } else if (assurance == StatementSourceAssurance.POSSIBLY_HAS_STATEMENTS) {
                     remoteCheckTasks.add(new CheckTaskPair(endpoint, stmt));
-                    spy.numASKQueries += 1;
+                    Spy.getInstance().numASKQueries += 1;
                 }
             }
         }

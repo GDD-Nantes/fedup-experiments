@@ -16,13 +16,14 @@ import org.apache.jena.tdb2.store.nodetable.NodeTable;
 import org.apache.jena.tdb2.store.nodetupletable.NodeTupleTable;
 import org.apache.jena.tdb2.sys.TDBInternal;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 
 /**
- * TDB2 Jena Backend implementation of the interface `Backend<ID, SKIP>`.
+ * TDB2 Jena Backend implementation of the interface `Backend`.
  **/
-public class JenaBackend implements Backend<NodeId, SerializableRecord> {
+public class JenaBackend implements Backend<NodeId, Serializable> {
 
     Dataset dataset;
     DatasetGraphTDB graph;
@@ -68,12 +69,11 @@ public class JenaBackend implements Backend<NodeId, SerializableRecord> {
     public void close() { graph.end(); }
 
 
-
-    
+    /* ****************************************************************************************** */
     // Backend interface
     
     @Override
-    public BackendIterator<NodeId, SerializableRecord> search(final NodeId s, final NodeId p, final NodeId o, final NodeId... c) {
+    public BackendIterator<NodeId, Serializable> search(final NodeId s, final NodeId p, final NodeId o, final NodeId... c) {
         if (c.length == 0) {
             Tuple<NodeId> pattern = TupleFactory.tuple(s, p, o);
             return new LazyIterator<>(this, preemptableTripleTupleTable.preemptFind(pattern));
@@ -112,4 +112,21 @@ public class JenaBackend implements Backend<NodeId, SerializableRecord> {
     public NodeId any() {
         return NodeId.NodeIdAny;
     }
+
+    /* **************************************************************************************** */
+
+    /**
+     * Convenience function that gets the id from the node, looking in both tables.
+     */
+    public NodeId getId(final Node node) throws NotFoundException {
+        NodeId id = nodeTripleTable.getNodeIdForNode(node);
+        if (NodeId.isDoesNotExist(id)) {
+            id = nodeQuadTable.getNodeIdForNode(node);
+            if (NodeId.isDoesNotExist(id)) {
+                throw new NotFoundException(String.format("Id of %s does not exist.", node.toString()));
+            }
+        }
+        return id;
+    }
+
 }

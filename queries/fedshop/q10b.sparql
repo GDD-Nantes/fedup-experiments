@@ -1,0 +1,21 @@
+PREFIX bsbm: <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> 
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT DISTINCT ?offer ?price WHERE {
+    # const bsbm:Product89481
+    ?offer bsbm:product ?localProductXYZ .
+    ?localProductXYZ owl:sameAs bsbm:Product89481 .
+    ?offer bsbm:vendor ?vendor .
+    #?offer dc:publisher ?vendor .
+    ?vendor bsbm:country <http://downlode.org/rdf/iso-3166/countries#US> .
+    ?offer bsbm:deliveryDays ?deliveryDays .
+    FILTER(?deliveryDays <= 3)
+    ?offer bsbm:price ?price .
+    ?offer bsbm:validTo ?date .
+    # const "2008-05-04T00:00:00"^^xsd:dateTime < ?date
+    FILTER (?date > "2008-05-04T00:00:00"^^xsd:dateTime )
+}
+ORDER BY ?offer ?price
+LIMIT 10

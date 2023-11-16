@@ -1,0 +1,11 @@
+SELECT ?actor ?news WHERE {
+    SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/lmdb> {
+        ?film <http://purl.org/dc/terms/title> "Tarzan" .
+        ?film <http://data.linkedmdb.org/resource/movie/actor> ?actor .
+        ?actor <http://www.w3.org/2002/07/owl#sameAs> ?x .
+    }
+    SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/nyt> {
+        ?y <http://www.w3.org/2002/07/owl#sameAs> ?x .
+        ?y <http://data.nytimes.com/elements/topicPage> ?news .
+    }
+}

@@ -1,0 +1,17 @@
+SELECT DISTINCT ?countryName ?countryCode ?locationMap ?population ?longitude ?latitude ?nationalAnthem ?foundingDate ?largestCity ?ethnicGroup ?motto WHERE {
+   ?NYTplace <http://www.geonames.org/ontology#population> ?population .
+   ?NYTplace <http://www.geonames.org/ontology#countryCode> ?countryCode .
+   ?NYTplace <http://www.geonames.org/ontology#name> ?countryName .
+   ?NYTplace <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?longitude .
+   ?NYTplace <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ?latitude .
+   ?NYTplace <http://www.w3.org/2002/07/owl#sameAs> ?geonameplace .
+   OPTIONAL {
+       ?geonameplace <http://dbpedia.org/ontology/anthem> ?nationalAnthem .
+       ?geonameplace <http://dbpedia.org/ontology/ethnicGroup> ?ethnicGroup .
+       ?geonameplace <http://dbpedia.org/ontology/motto> ?motto .
+       ?geonameplace <http://dbpedia.org/ontology/largestCity> ?largestCity .
+       ?geonameplace <http://dbpedia.org/ontology/capital> ?capital .
+       ?geonameplace <http://dbpedia.org/ontology/foundingDate> ?foundingDate .
+   }
+}
+LIMIT 50

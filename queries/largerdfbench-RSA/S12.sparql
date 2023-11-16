@@ -1,0 +1,14 @@
+SELECT ?drug ?keggUrl ?chebiImage WHERE {
+    SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/drugbank> {
+        ?drug <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs> . 
+        ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/keggCompoundId> ?keggDrug .
+        ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/genericName> ?drugBankName .
+    } 
+    SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/kegg> {
+        ?keggDrug <http://bio2rdf.org/ns/bio2rdf#url> ?keggUrl .
+    }
+    SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/chebi> {
+        ?chebiDrug <http://purl.org/dc/elements/1.1/title> ?drugBankName . 
+        ?chebiDrug <http://bio2rdf.org/ns/bio2rdf#image> ?chebiImage .
+    }
+}

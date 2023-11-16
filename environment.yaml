@@ -9,11 +9,14 @@ dependencies:
   - seaborn
   - altair
   - numpy
+  - gdown
   - matplotlib
+  - SPARQLWrapper
   - notebook
   - pandas
   - setuptools
   - requests
+  - click
   - pip
   - pip:
     - snakemake

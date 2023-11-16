@@ -1,3 +1,11 @@
+**~
+**.zip
+benchmark/
+*.png
+*.log
+*.csv
+
+temp/
 .idea/
 
 target/
@@ -20,9 +28,9 @@ buildNumber.properties
 apache-jena-*
 summaries
 datasets
-queries
 output
 .snakemake
 .m2
 .log
 cache.db
+.idea

@@ -1,0 +1,12 @@
+SELECT ?predicate ?object WHERE {
+    {
+        SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/dbpedia> {
+            <http://dbpedia.org/resource/Barack_Obama> ?predicate ?object .
+        }
+    } UNION {
+        SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/nyt> {
+            ?subject <http://www.w3.org/2002/07/owl#sameAs> <http://dbpedia.org/resource/Barack_Obama> .
+            ?subject ?predicate ?object .
+        }
+    }
+}

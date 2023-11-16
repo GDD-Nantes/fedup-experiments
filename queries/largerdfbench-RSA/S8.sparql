@@ -1,0 +1,11 @@
+SELECT ?drug ?melt WHERE {
+    {
+        SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/drugbank> {
+            ?drug <http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/meltingPoint> ?melt .
+        }
+	} UNION {
+	    SERVICE <http://localhost:8890/sparql?default-graph-uri=http://example.com/dbpedia> {
+	        ?drug <http://dbpedia.org/ontology/Drug/meltingPoint> ?melt .
+	    }
+	}
+}

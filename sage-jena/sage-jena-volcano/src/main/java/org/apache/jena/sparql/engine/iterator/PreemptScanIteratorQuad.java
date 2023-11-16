@@ -11,6 +11,7 @@ import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.tdb2.store.NodeId;
 import org.apache.jena.tdb2.store.nodetable.NodeTable;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Objects;
 
@@ -25,7 +26,7 @@ import java.util.Objects;
  */
 public class PreemptScanIteratorQuad implements Iterator<Quad> {
 
-    public BackendIterator<NodeId, SerializableRecord> wrapped;
+    public BackendIterator<NodeId, Serializable> wrapped;
     NodeTable nodeTable;
 
     SageInput<?>  input;
@@ -37,7 +38,7 @@ public class PreemptScanIteratorQuad implements Iterator<Quad> {
 
 
     
-    public PreemptScanIteratorQuad(BackendIterator<NodeId, SerializableRecord> wrapped, NodeTable nodeTable,
+    public PreemptScanIteratorQuad(BackendIterator<NodeId, Serializable> wrapped, NodeTable nodeTable,
                                    SageInput<?> input, SageOutput<?> output, Integer id) {
         this.wrapped = wrapped;
         this.nodeTable = nodeTable;

@@ -1,10 +1,9 @@
 package org.apache.jena.dboe.trans.bplustree;
 
-import fr.gdd.sage.InMemoryInstanceOfTDB2WithSimpleData;
+import fr.gdd.sage.databases.inmemory.InMemoryInstanceOfTDB2WithSimpleData;
 import fr.gdd.sage.interfaces.BackendIterator;
 import fr.gdd.sage.interfaces.SPOC;
 import fr.gdd.sage.jena.JenaBackend;
-import fr.gdd.sage.jena.SerializableRecord;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.tdb2.store.NodeId;
 import org.apache.jena.tdb2.sys.TDBInternal;
@@ -12,7 +11,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.io.Serializable;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * The issue 14 is quite difficult to reproduce. It happens rarely, and only
@@ -60,7 +62,7 @@ public class ChasingIssue14Test {
     public void has_next_does_not_move_the_cursor() {
         // important to figure out since some backend move their cursor on
         // `hasNext` and `next` is only to produce the value.
-        BackendIterator<NodeId, SerializableRecord> it1 = backend.search(any, named, any);
+        BackendIterator<NodeId, Serializable> it1 = backend.search(any, named, any);
         for (int i = 0; i < 100; ++i) { // only has 2 items yet can call hasNext 100 times
             assert (it1.hasNext());
         }
@@ -75,19 +77,19 @@ public class ChasingIssue14Test {
     @Test
     public void stopping_at_each_step_of_2_triples_with_singleton_and_null() {
         // SELECT * WHERE { ?person <named> ?name . ?name <owns> ?animal }
-        BackendIterator<NodeId, SerializableRecord> it1 = backend.search(any, named, any);
+        BackendIterator<NodeId, Serializable> it1 = backend.search(any, named, any);
 
         // even at very first we stop… (despite in normal run, would not be possible)
-        SerializableRecord saved_it1 = it1.current();
+        Serializable saved_it1 = it1.current();
         it1 = backend.search(any, named, any);
         it1.skip(saved_it1);
         it1.next();
         assertEquals(bob, it1.getId(SPOC.OBJECT));
 
         // also save at very first it2 before its `next`
-        BackendIterator<NodeId, SerializableRecord> it2 = backend.search(bob, owns, any);
+        BackendIterator<NodeId, Serializable> it2 = backend.search(bob, owns, any);
         saved_it1 = it1.previous();
-        SerializableRecord saved_it2 = it2.current();
+        Serializable saved_it2 = it2.current();
         it1 = backend.search(any, named, any);
         it1.skip(saved_it1);
         it2 = backend.search(bob, owns, any);

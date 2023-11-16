@@ -1,6 +1,6 @@
 package org.apache.jena.dboe.trans.bplustree;
 
-import fr.gdd.sage.InMemoryInstanceOfTDB2;
+import fr.gdd.sage.databases.inmemory.InMemoryInstanceOfTDB2;
 import fr.gdd.sage.generics.Pair;
 import fr.gdd.sage.interfaces.BackendIterator;
 import fr.gdd.sage.interfaces.SPOC;
@@ -15,6 +15,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -93,19 +94,19 @@ public class PreemptJenaIteratorTest {
         ArrayList<String> objects = new ArrayList<>();
         fillWithSolutions(subjects, predicates, objects, any, predicate, any);
 
-        BackendIterator<?, SerializableRecord> it = backend.search(any, predicate, any);
+        BackendIterator<?, Serializable> it = backend.search(any, predicate, any);
         assert(it.hasNext());
         it.next();
         assertTriple(subjects, predicates, objects, 0, it);
 
         assertNotNull(it.current());
-        BackendIterator<?, SerializableRecord> it2 = backend.search(any, predicate, any);
+        BackendIterator<?, Serializable> it2 = backend.search(any, predicate, any);
         it2.skip(it.current());
         assert(it2.hasNext());
         it2.next();
         assertTriple(subjects,predicates,objects, 1, it2);
 
-        BackendIterator<?, SerializableRecord> it3 = backend.search(any, predicate, any);
+        BackendIterator<?, Serializable> it3 = backend.search(any, predicate, any);
         it3.skip(it2.current());
         assert(it3.hasNext());
         it3.next();
@@ -120,7 +121,7 @@ public class PreemptJenaIteratorTest {
         ArrayList<String> objects = new ArrayList<>();
         fillWithSolutions(subjects, predicates, objects, any, predicate, any);
 
-        BackendIterator<?, SerializableRecord> it = backend.search(any, predicate, any);
+        BackendIterator<?, Serializable> it = backend.search(any, predicate, any);
         int nbResults = 0;
         int stoppingIndex = 5;
         while (nbResults < stoppingIndex && it.hasNext()) { // carefully call hasNext after stopping
@@ -132,7 +133,10 @@ public class PreemptJenaIteratorTest {
         assertEquals(predicates.get(stoppingIndex - 1), it.getValue(SPOC.PREDICATE));
         assertEquals(objects.get(stoppingIndex - 1), it.getValue(SPOC.OBJECT));
 
-        BackendIterator<?, SerializableRecord> it2 = backend.search(any, predicate, any);
+        SerializableRecord sr = (SerializableRecord) it.current();
+        assertEquals(stoppingIndex, sr.getOffset());
+
+        BackendIterator<?, Serializable> it2 = backend.search(any, predicate, any);
         it2.skip(it.current());
 
         int nbResultsFinish = 0;
@@ -145,27 +149,37 @@ public class PreemptJenaIteratorTest {
         }
 
         assertEquals(dataset.getDefaultModel().size(), nbResultsFinish + nbResults);
+
+        sr = (SerializableRecord) it2.current();
+        assertEquals(dataset.getDefaultModel().size(), sr.getOffset());
     }
 
 
     @Test
     public void nested_scans_with_stop_resume_at_first() {
         NodeId city_2 = backend.getId("<http://db.uwaterloo.ca/~galuc/wsdbm/City102>");
-        BackendIterator<NodeId, SerializableRecord> it = backend.search(city_2, any, any);
+        BackendIterator<NodeId, Serializable> it = backend.search(city_2, any, any);
 
-        SageOutput<SerializableRecord> output = new SageOutput<>();
+        SageOutput<Serializable> output = new SageOutput<>();
 
         // #1 first part of the query, we stop at first result
         int nb_results = 0;
         while (it.hasNext()) {
             it.next();
-            BackendIterator<?, SerializableRecord> it_2 = backend.search(any, it.getId(SPOC.PREDICATE), any);
+            BackendIterator<?, Serializable> it_2 = backend.search(any, it.getId(SPOC.PREDICATE), any);
             while (it_2.hasNext()) {
                 it_2.next();
                 nb_results += 1;
                 if (nb_results >= 1) { // limit 1
                     assertNull(it.previous());
                     output.save(new Pair<>(0, it.previous()), new Pair<>(1, it_2.current()));
+
+                    // Both are null since they both stop at their first iteration
+                    SerializableRecord sr = (SerializableRecord) it.previous();
+                    SerializableRecord sr_2 = (SerializableRecord) it_2.previous();
+                    assertNull(sr);
+                    assertNull(sr_2);
+
                     break;
                 }
             }
@@ -174,13 +188,13 @@ public class PreemptJenaIteratorTest {
         assertEquals(1, nb_results);
 
         // #2 second part of the query, we restart from the first result, then we run till the end.
-        BackendIterator<NodeId, SerializableRecord> it_resume = backend.search(city_2, any, any);
+        BackendIterator<NodeId, Serializable> it_resume = backend.search(city_2, any, any);
         it_resume.skip(output.getState().get(0));
         while (it_resume.hasNext()) {
             it_resume.next();
-            BackendIterator<?, SerializableRecord> it_2_resume = backend.search(any, it.getId(SPOC.PREDICATE), any);
+            BackendIterator<?, Serializable> it_2_resume = backend.search(any, it.getId(SPOC.PREDICATE), any);
             if (output.getState().containsKey(1)) {
-                SerializableRecord to = output.getState().remove(1);
+                Serializable to = output.getState().remove(1);
                 it_2_resume.skip(to);
             }
             while (it_2_resume.hasNext()) {
@@ -201,10 +215,10 @@ public class PreemptJenaIteratorTest {
 
         // #A first run to check that singleton works well
         long sum = 0;
-        BackendIterator<NodeId, SerializableRecord> itSingleton = backend.search(city_2, parentCountry, country_17);
+        BackendIterator<NodeId, Serializable> itSingleton = backend.search(city_2, parentCountry, country_17);
         while (itSingleton.hasNext()) {
             itSingleton.next();
-            BackendIterator<NodeId, SerializableRecord> itWithPredicate = backend.search(any, predicate, any);
+            BackendIterator<NodeId, Serializable> itWithPredicate = backend.search(any, predicate, any);
             while (itWithPredicate.hasNext()) {
                 itWithPredicate.next();
                 sum += 1;
@@ -215,10 +229,10 @@ public class PreemptJenaIteratorTest {
         // #B now the same with preemption
         sum = 0;
         itSingleton = backend.search(city_2, parentCountry, country_17);
-        SageOutput<SerializableRecord> output = new SageOutput<>();
+        SageOutput<Serializable> output = new SageOutput<>();
         while (itSingleton.hasNext()) {
             itSingleton.next();
-            BackendIterator<NodeId, SerializableRecord> itWithPredicate = backend.search(any, predicate, any);
+            BackendIterator<NodeId, Serializable> itWithPredicate = backend.search(any, predicate, any);
             while (itWithPredicate.hasNext()) {
                 itWithPredicate.next();
                 sum += 1;
@@ -238,7 +252,7 @@ public class PreemptJenaIteratorTest {
         }
         while (itSingleton.hasNext()) {
             itSingleton.next();
-            BackendIterator<NodeId, SerializableRecord> itWithPredicate = backend.search(any, predicate, any);
+            BackendIterator<NodeId, Serializable> itWithPredicate = backend.search(any, predicate, any);
             // no key to skip to
             if (output.getState().containsKey(1)) {
                 itSingleton.skip(output.getState().remove(1));
@@ -284,14 +298,14 @@ public class PreemptJenaIteratorTest {
         NodeId parentCountry = backend.getId("<http://www.geonames.org/ontology#parentCountry>");
         NodeId country_17 = backend.getId("<http://db.uwaterloo.ca/~galuc/wsdbm/Country17>");
 
-        BackendIterator<NodeId, SerializableRecord> itWithPredicate = backend.search(any, predicate, any);
+        BackendIterator<NodeId, Serializable> itWithPredicate = backend.search(any, predicate, any);
         if (!Objects.isNull(input) && input.getState().containsKey(0)) {
             itWithPredicate.skip(input.getState(0));
         }
         while (itWithPredicate.hasNext()) {
             itWithPredicate.next();
 
-            BackendIterator<NodeId, SerializableRecord> itSingleton = backend.search(city_2, parentCountry, country_17);
+            BackendIterator<NodeId, Serializable> itSingleton = backend.search(city_2, parentCountry, country_17);
             if (!Objects.isNull(input) && input.getState().containsKey(1)) {
                 itSingleton.skip(input.getState(1));
             }

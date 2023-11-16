@@ -343,10 +343,10 @@ public class FedXConnection extends AbstractSailConnection {
 		// log the optimized query plan, if Config#isLogQueryPlan(), otherwise void operation
 		federation.getMonitoring().logQueryPlan(query);
 		
-		if (federation.getConfig().isDebugQueryPlan()) {
+		/*if (federation.getConfig().isDebugQueryPlan()) {
 			System.out.println("Optimized query execution plan: \n" + query);
 			log.debug("Optimized query execution plan: \n" + query);
-		}
+		}*/
 		
 		try {
 			return strategy.evaluate(query, EmptyBindingSet.getInstance());
