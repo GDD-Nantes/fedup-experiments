@@ -301,3 +301,21 @@ Experimental results and plot scripts are available in the [results](https://git
 [//]: # ()
 [//]: # (## Experimental Results)
 
+## Supplement materials
+
+### FedShop: FedUP vs RSA
+- Figure 1: Engines execution time (ms) when the federation grows.
+![image](results/exec_time.png)
+
+- Figure 2: Source selection time (ms) when the federation grows (RSA has no source-selection time as the source selection is pre-computed)
+![image](results/source_selection_time.png)
+
+- Figure 3: Data Transfer (MB) when the federation grows
+![image](results/data_transfer.png)
+
+- Figure 4: Number of ASK when the federation grows
+![image](results/ask.png)
+
+
+
+
