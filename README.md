@@ -301,7 +301,12 @@ Experimental results and plot scripts are available in the [results](https://git
 [//]: # ()
 [//]: # (## Experimental Results)
 
-## Supplement materials
+## Supplementary materials
+
+### csv
+
+All measurements for [LargeRDFBench](results/results_largerdfbench.csv) and [FedShop on batches 0 and
+9](results/results_fedshop.csv) are available.
 
 ### Source selection times
 
@@ -318,7 +323,6 @@ scale for source selection times goes down to 0.0001.
 ![image](results/largerdfbench_source_selection_time.png)
 
 ![image](results/fedshop_source_selection_time_batch_0_9.png)
-
 
 
 

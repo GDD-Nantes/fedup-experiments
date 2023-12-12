@@ -1,0 +1,481 @@
+,query,approach,metric,run,value
+0,S1,FedX,CostFed with the same query optimizer as others,3.0,0.0
+1,S1,FedX,Source Selection Time,3.0,0.034199999999999994
+2,S1,FedX,Execution Time,3.0,0.0112
+3,S1,FedX,Timeout,3.0,0.0
+4,S1,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+5,S1,HiBiscuS,Source Selection Time,3.0,0.03
+6,S1,HiBiscuS,Execution Time,3.0,0.0072
+7,S1,HiBiscuS,Timeout,3.0,0.0
+8,S1,CostFed,CostFed with the same query optimizer as others,3.0,-0.0008
+9,S1,CostFed,Source Selection Time,3.0,0.032600000000000004
+10,S1,CostFed,Execution Time,3.0,0.0076
+11,S1,CostFed,Timeout,3.0,0.0
+12,S1,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+13,S1,FedUP,Source Selection Time,3.0,0.0098
+14,S1,FedUP,Execution Time,3.0,0.051000000000000004
+15,S1,FedUP,Timeout,3.0,0.0
+16,S1,RSA,CostFed with the same query optimizer as others,3.0,0.0
+17,S1,RSA,Source Selection Time,3.0,0.0
+18,S1,RSA,Execution Time,3.0,0.40700000000000003
+19,S1,RSA,Timeout,3.0,0.0
+20,S2,FedX,CostFed with the same query optimizer as others,3.0,0.0
+21,S2,FedX,Source Selection Time,3.0,0.0222
+22,S2,FedX,Execution Time,3.0,0.0048000000000000004
+23,S2,FedX,Timeout,3.0,0.0
+24,S2,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+25,S2,HiBiscuS,Source Selection Time,3.0,0.0128
+26,S2,HiBiscuS,Execution Time,3.0,0.0056
+27,S2,HiBiscuS,Timeout,3.0,0.0
+28,S2,CostFed,CostFed with the same query optimizer as others,3.0,-0.0021999999999999997
+29,S2,CostFed,Source Selection Time,3.0,0.017599999999999998
+30,S2,CostFed,Execution Time,3.0,0.0076
+31,S2,CostFed,Timeout,3.0,0.0
+32,S2,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+33,S2,FedUP,Source Selection Time,3.0,0.0004
+34,S2,FedUP,Execution Time,3.0,0.007000000000000001
+35,S2,FedUP,Timeout,3.0,0.0
+36,S2,RSA,CostFed with the same query optimizer as others,3.0,0.0
+37,S2,RSA,Source Selection Time,3.0,0.0
+38,S2,RSA,Execution Time,3.0,0.39540000000000003
+39,S2,RSA,Timeout,3.0,0.0
+40,S3,FedX,CostFed with the same query optimizer as others,3.0,0.0
+41,S3,FedX,Source Selection Time,3.0,0.030200000000000005
+42,S3,FedX,Execution Time,3.0,0.016599999999999997
+43,S3,FedX,Timeout,3.0,0.0
+44,S3,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+45,S3,HiBiscuS,Source Selection Time,3.0,0.005
+46,S3,HiBiscuS,Execution Time,3.0,0.015
+47,S3,HiBiscuS,Timeout,3.0,0.0
+48,S3,CostFed,CostFed with the same query optimizer as others,3.0,-0.341
+49,S3,CostFed,Source Selection Time,3.0,0.008
+50,S3,CostFed,Execution Time,3.0,0.3584
+51,S3,CostFed,Timeout,3.0,0.0
+52,S3,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+53,S3,FedUP,Source Selection Time,3.0,0.0008
+54,S3,FedUP,Execution Time,3.0,0.0316
+55,S3,FedUP,Timeout,3.0,0.0
+56,S3,RSA,CostFed with the same query optimizer as others,3.0,0.0
+57,S3,RSA,Source Selection Time,3.0,0.0
+58,S3,RSA,Execution Time,3.0,0.43439999999999995
+59,S3,RSA,Timeout,3.0,0.0
+60,S4,FedX,CostFed with the same query optimizer as others,3.0,0.0
+61,S4,FedX,Source Selection Time,3.0,0.0312
+62,S4,FedX,Execution Time,3.0,0.0224
+63,S4,FedX,Timeout,3.0,0.0
+64,S4,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+65,S4,HiBiscuS,Source Selection Time,3.0,0.008
+66,S4,HiBiscuS,Execution Time,3.0,0.0092
+67,S4,HiBiscuS,Timeout,3.0,0.0
+68,S4,CostFed,CostFed with the same query optimizer as others,3.0,-0.0012
+69,S4,CostFed,Source Selection Time,3.0,0.0016
+70,S4,CostFed,Execution Time,3.0,0.013600000000000001
+71,S4,CostFed,Timeout,3.0,0.0
+72,S4,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+73,S4,FedUP,Source Selection Time,3.0,0.0004
+74,S4,FedUP,Execution Time,3.0,0.0176
+75,S4,FedUP,Timeout,3.0,0.0
+76,S4,RSA,CostFed with the same query optimizer as others,3.0,0.0
+77,S4,RSA,Source Selection Time,3.0,0.0
+78,S4,RSA,Execution Time,3.0,0.3964
+79,S4,RSA,Timeout,3.0,0.0
+80,S5,FedX,CostFed with the same query optimizer as others,3.0,0.0
+81,S5,FedX,Source Selection Time,3.0,0.0256
+82,S5,FedX,Execution Time,3.0,0.0156
+83,S5,FedX,Timeout,3.0,0.0
+84,S5,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+85,S5,HiBiscuS,Source Selection Time,3.0,0.0038
+86,S5,HiBiscuS,Execution Time,3.0,0.0156
+87,S5,HiBiscuS,Timeout,3.0,0.0
+88,S5,CostFed,CostFed with the same query optimizer as others,3.0,0.0006000000000000001
+89,S5,CostFed,Source Selection Time,3.0,0.0086
+90,S5,CostFed,Execution Time,3.0,0.0164
+91,S5,CostFed,Timeout,3.0,0.0
+92,S5,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+93,S5,FedUP,Source Selection Time,3.0,0.0008
+94,S5,FedUP,Execution Time,3.0,0.027600000000000003
+95,S5,FedUP,Timeout,3.0,0.0
+96,S5,RSA,CostFed with the same query optimizer as others,3.0,0.0
+97,S5,RSA,Source Selection Time,3.0,0.0
+98,S5,RSA,Execution Time,3.0,0.4104
+99,S5,RSA,Timeout,3.0,0.0
+100,S6,FedX,CostFed with the same query optimizer as others,3.0,0.0
+101,S6,FedX,Source Selection Time,3.0,0.028599999999999997
+102,S6,FedX,Execution Time,3.0,0.1348
+103,S6,FedX,Timeout,3.0,0.0
+104,S6,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+105,S6,HiBiscuS,Source Selection Time,3.0,0.0038
+106,S6,HiBiscuS,Execution Time,3.0,0.10640000000000001
+107,S6,HiBiscuS,Timeout,3.0,0.0
+108,S6,CostFed,CostFed with the same query optimizer as others,3.0,-0.1762
+109,S6,CostFed,Source Selection Time,3.0,0.001
+110,S6,CostFed,Execution Time,3.0,0.2834
+111,S6,CostFed,Timeout,3.0,0.0
+112,S6,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+113,S6,FedUP,Source Selection Time,3.0,0.0002
+114,S6,FedUP,Execution Time,3.0,1.0796
+115,S6,FedUP,Timeout,3.0,0.0
+116,S6,RSA,CostFed with the same query optimizer as others,3.0,0.0
+117,S6,RSA,Source Selection Time,3.0,0.0
+118,S6,RSA,Execution Time,3.0,2.8372
+119,S6,RSA,Timeout,3.0,0.0
+120,S7,FedX,CostFed with the same query optimizer as others,3.0,0.0
+121,S7,FedX,Source Selection Time,3.0,0.0298
+122,S7,FedX,Execution Time,3.0,0.1224
+123,S7,FedX,Timeout,3.0,0.0
+124,S7,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+125,S7,HiBiscuS,Source Selection Time,3.0,0.005
+126,S7,HiBiscuS,Execution Time,3.0,330.85
+127,S7,HiBiscuS,Timeout,3.0,0.0
+128,S7,CostFed,CostFed with the same query optimizer as others,3.0,331.5836
+129,S7,CostFed,Source Selection Time,3.0,0.0014
+130,S7,CostFed,Execution Time,3.0,0.22400000000000003
+131,S7,CostFed,Timeout,3.0,0.0
+132,S7,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+133,S7,FedUP,Source Selection Time,3.0,0.0008
+134,S7,FedUP,Execution Time,3.0,1.9617999999999998
+135,S7,FedUP,Timeout,3.0,0.0
+136,S7,RSA,CostFed with the same query optimizer as others,3.0,0.0
+137,S7,RSA,Source Selection Time,3.0,0.0
+138,S7,RSA,Execution Time,3.0,1.0699999999999998
+139,S7,RSA,Timeout,3.0,0.0
+140,S8,FedX,CostFed with the same query optimizer as others,3.0,0.0
+141,S8,FedX,Source Selection Time,3.0,0.0332
+142,S8,FedX,Execution Time,3.0,0.0378
+143,S8,FedX,Timeout,3.0,0.0
+144,S8,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+145,S8,HiBiscuS,Source Selection Time,3.0,0.0008
+146,S8,HiBiscuS,Execution Time,3.0,0.0578
+147,S8,HiBiscuS,Timeout,3.0,0.0
+148,S8,CostFed,CostFed with the same query optimizer as others,3.0,-0.0014000000000000006
+149,S8,CostFed,Source Selection Time,3.0,0.0006000000000000001
+150,S8,CostFed,Execution Time,3.0,0.053200000000000004
+151,S8,CostFed,Timeout,3.0,0.0
+152,S8,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+153,S8,FedUP,Source Selection Time,3.0,0.0
+154,S8,FedUP,Execution Time,3.0,0.0492
+155,S8,FedUP,Timeout,3.0,0.0
+156,S8,RSA,CostFed with the same query optimizer as others,3.0,0.0
+157,S8,RSA,Source Selection Time,3.0,0.0
+158,S8,RSA,Execution Time,3.0,0.5154
+159,S8,RSA,Timeout,3.0,0.0
+160,S9,FedX,CostFed with the same query optimizer as others,3.0,0.0
+161,S9,FedX,Source Selection Time,3.0,0.033600000000000005
+162,S9,FedX,Execution Time,3.0,0.026600000000000002
+163,S9,FedX,Timeout,3.0,0.0
+164,S9,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+165,S9,HiBiscuS,Source Selection Time,3.0,0.035199999999999995
+166,S9,HiBiscuS,Execution Time,3.0,0.0186
+167,S9,HiBiscuS,Timeout,3.0,0.0
+168,S9,CostFed,CostFed with the same query optimizer as others,3.0,-0.013600000000000001
+169,S9,CostFed,Source Selection Time,3.0,0.038
+170,S9,CostFed,Execution Time,3.0,0.0308
+171,S9,CostFed,Timeout,3.0,0.0
+172,S9,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+173,S9,FedUP,Source Selection Time,3.0,0.007000000000000001
+174,S9,FedUP,Execution Time,3.0,0.058399999999999994
+175,S9,FedUP,Timeout,3.0,0.0
+176,S9,RSA,CostFed with the same query optimizer as others,3.0,0.0
+177,S9,RSA,Source Selection Time,3.0,0.0
+178,S9,RSA,Execution Time,3.0,0.4908
+179,S9,RSA,Timeout,3.0,0.0
+180,S10,FedX,CostFed with the same query optimizer as others,3.0,0.0
+181,S10,FedX,Source Selection Time,3.0,0.0518
+182,S10,FedX,Execution Time,3.0,2.2878
+183,S10,FedX,Timeout,3.0,0.0
+184,S10,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+185,S10,HiBiscuS,Source Selection Time,3.0,0.005
+186,S10,HiBiscuS,Execution Time,3.0,2.4547999999999996
+187,S10,HiBiscuS,Timeout,3.0,0.0
+188,S10,CostFed,CostFed with the same query optimizer as others,3.0,0.1328
+189,S10,CostFed,Source Selection Time,3.0,0.0014
+190,S10,CostFed,Execution Time,3.0,2.2898
+191,S10,CostFed,Timeout,3.0,0.0
+192,S10,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+193,S10,FedUP,Source Selection Time,3.0,0.0004
+194,S10,FedUP,Execution Time,3.0,2.3291999999999997
+195,S10,FedUP,Timeout,3.0,0.0
+196,S10,RSA,CostFed with the same query optimizer as others,3.0,0.0
+197,S10,RSA,Source Selection Time,3.0,0.0
+198,S10,RSA,Execution Time,3.0,9.867799999999999
+199,S10,RSA,Timeout,3.0,0.0
+200,S11,FedX,CostFed with the same query optimizer as others,3.0,0.0
+201,S11,FedX,Source Selection Time,3.0,0.039
+202,S11,FedX,Execution Time,3.0,0.005200000000000001
+203,S11,FedX,Timeout,3.0,0.0
+204,S11,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+205,S11,HiBiscuS,Source Selection Time,3.0,0.0016
+206,S11,HiBiscuS,Execution Time,3.0,0.008799999999999999
+207,S11,HiBiscuS,Timeout,3.0,0.0
+208,S11,CostFed,CostFed with the same query optimizer as others,3.0,-0.9124000000000001
+209,S11,CostFed,Source Selection Time,3.0,0.0118
+210,S11,CostFed,Execution Time,3.0,0.9238
+211,S11,CostFed,Timeout,3.0,0.0
+212,S11,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+213,S11,FedUP,Source Selection Time,3.0,0.001
+214,S11,FedUP,Execution Time,3.0,0.0116
+215,S11,FedUP,Timeout,3.0,0.0
+216,S11,RSA,CostFed with the same query optimizer as others,3.0,0.0
+217,S11,RSA,Source Selection Time,3.0,0.0
+218,S11,RSA,Execution Time,3.0,0.40140000000000003
+219,S11,RSA,Timeout,3.0,0.0
+220,S12,FedX,CostFed with the same query optimizer as others,3.0,0.0
+221,S12,FedX,Source Selection Time,3.0,0.0748
+222,S12,FedX,Execution Time,3.0,0.6604
+223,S12,FedX,Timeout,3.0,0.0
+224,S12,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+225,S12,HiBiscuS,Source Selection Time,3.0,0.004
+226,S12,HiBiscuS,Execution Time,3.0,0.4862
+227,S12,HiBiscuS,Timeout,3.0,0.0
+228,S12,CostFed,CostFed with the same query optimizer as others,3.0,0.0474
+229,S12,CostFed,Source Selection Time,3.0,0.001
+230,S12,CostFed,Execution Time,3.0,0.7352000000000001
+231,S12,CostFed,Timeout,3.0,0.0
+232,S12,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+233,S12,FedUP,Source Selection Time,3.0,0.0006000000000000001
+234,S12,FedUP,Execution Time,3.0,2.6746000000000003
+235,S12,FedUP,Timeout,3.0,0.0
+236,S12,RSA,CostFed with the same query optimizer as others,3.0,0.0
+237,S12,RSA,Source Selection Time,3.0,0.0
+238,S12,RSA,Execution Time,3.0,4.8982
+239,S12,RSA,Timeout,3.0,0.0
+240,S13,FedX,CostFed with the same query optimizer as others,3.0,0.0
+241,S13,FedX,Source Selection Time,3.0,0.0632
+242,S13,FedX,Execution Time,3.0,51.08
+243,S13,FedX,Timeout,3.0,0.0
+244,S13,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+245,S13,HiBiscuS,Source Selection Time,3.0,0.004
+246,S13,HiBiscuS,Execution Time,3.0,51.208000000000006
+247,S13,HiBiscuS,Timeout,3.0,0.0
+248,S13,CostFed,CostFed with the same query optimizer as others,3.0,15.3298
+249,S13,CostFed,Source Selection Time,3.0,0.0104
+250,S13,CostFed,Execution Time,3.0,0.036
+251,S13,CostFed,Timeout,3.0,0.0
+252,S13,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+253,S13,FedUP,Source Selection Time,3.0,0.0006000000000000001
+254,S13,FedUP,Execution Time,3.0,192.8346
+255,S13,FedUP,Timeout,3.0,0.0
+256,S13,RSA,CostFed with the same query optimizer as others,3.0,0.0
+257,S13,RSA,Source Selection Time,3.0,0.0
+258,S13,RSA,Execution Time,3.0,36.074799999999996
+259,S13,RSA,Timeout,3.0,0.0
+260,S14,FedX,CostFed with the same query optimizer as others,3.0,0.0
+261,S14,FedX,Source Selection Time,3.0,0.0514
+262,S14,FedX,Execution Time,3.0,3.5473999999999997
+263,S14,FedX,Timeout,3.0,0.0
+264,S14,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+265,S14,HiBiscuS,Source Selection Time,3.0,0.0028
+266,S14,HiBiscuS,Execution Time,3.0,3.5166000000000004
+267,S14,HiBiscuS,Timeout,3.0,0.0
+268,S14,CostFed,CostFed with the same query optimizer as others,3.0,0.13140000000000002
+269,S14,CostFed,Source Selection Time,3.0,0.0006000000000000001
+270,S14,CostFed,Execution Time,3.0,3.3129999999999997
+271,S14,CostFed,Timeout,3.0,0.0
+272,S14,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+273,S14,FedUP,Source Selection Time,3.0,0.0002
+274,S14,FedUP,Execution Time,3.0,3.245
+275,S14,FedUP,Timeout,3.0,0.0
+276,S14,RSA,CostFed with the same query optimizer as others,3.0,0.0
+277,S14,RSA,Source Selection Time,3.0,0.0
+278,S14,RSA,Execution Time,3.0,5.1898
+279,S14,RSA,Timeout,3.0,0.0
+280,C1,FedX,CostFed with the same query optimizer as others,3.0,0.0
+281,C1,FedX,Source Selection Time,3.0,0.059
+282,C1,FedX,Execution Time,3.0,4.223000000000001
+283,C1,FedX,Timeout,3.0,0.0
+284,C1,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+285,C1,HiBiscuS,Source Selection Time,3.0,0.004200000000000001
+286,C1,HiBiscuS,Execution Time,3.0,3.8862
+287,C1,HiBiscuS,Timeout,3.0,0.0
+288,C1,CostFed,CostFed with the same query optimizer as others,3.0,-0.8854
+289,C1,CostFed,Source Selection Time,3.0,0.0134
+290,C1,CostFed,Execution Time,3.0,3.6974000000000005
+291,C1,CostFed,Timeout,3.0,0.0
+292,C1,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+293,C1,FedUP,Source Selection Time,3.0,0.0018000000000000002
+294,C1,FedUP,Execution Time,3.0,3.2283999999999997
+295,C1,FedUP,Timeout,3.0,0.0
+296,C1,RSA,CostFed with the same query optimizer as others,3.0,0.0
+297,C1,RSA,Source Selection Time,3.0,0.0
+298,C1,RSA,Execution Time,3.0,2.968
+299,C1,RSA,Timeout,3.0,0.0
+300,C2,FedX,CostFed with the same query optimizer as others,3.0,0.0
+301,C2,FedX,Source Selection Time,3.0,0.0526
+302,C2,FedX,Execution Time,3.0,0.5208
+303,C2,FedX,Timeout,3.0,0.0
+304,C2,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+305,C2,HiBiscuS,Source Selection Time,3.0,0.004399999999999999
+306,C2,HiBiscuS,Execution Time,3.0,0.46240000000000003
+307,C2,HiBiscuS,Timeout,3.0,0.0
+308,C2,CostFed,CostFed with the same query optimizer as others,3.0,-0.5029999999999999
+309,C2,CostFed,Source Selection Time,3.0,0.0012000000000000001
+310,C2,CostFed,Execution Time,3.0,2.7502
+311,C2,CostFed,Timeout,3.0,0.0
+312,C2,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+313,C2,FedUP,Source Selection Time,3.0,0.0008
+314,C2,FedUP,Execution Time,3.0,2.6171999999999995
+315,C2,FedUP,Timeout,3.0,0.0
+316,C2,RSA,CostFed with the same query optimizer as others,3.0,0.0
+317,C2,RSA,Source Selection Time,3.0,0.0
+318,C2,RSA,Execution Time,3.0,6.1988
+319,C2,RSA,Timeout,3.0,0.0
+320,C3,FedX,CostFed with the same query optimizer as others,3.0,0.0
+321,C3,FedX,Source Selection Time,3.0,0.0984
+322,C3,FedX,Execution Time,3.0,5.960800000000001
+323,C3,FedX,Timeout,3.0,0.0
+324,C3,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+325,C3,HiBiscuS,Source Selection Time,3.0,0.0068000000000000005
+326,C3,HiBiscuS,Execution Time,3.0,3.6866
+327,C3,HiBiscuS,Timeout,3.0,0.0
+328,C3,CostFed,CostFed with the same query optimizer as others,3.0,3.4568
+329,C3,CostFed,Source Selection Time,3.0,0.0016
+330,C3,CostFed,Execution Time,3.0,0.30179999999999996
+331,C3,CostFed,Timeout,3.0,0.0
+332,C3,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+333,C3,FedUP,Source Selection Time,3.0,0.001
+334,C3,FedUP,Execution Time,3.0,5.7624
+335,C3,FedUP,Timeout,3.0,0.0
+336,C3,RSA,CostFed with the same query optimizer as others,3.0,0.0
+337,C3,RSA,Source Selection Time,3.0,0.0
+338,C3,RSA,Execution Time,3.0,11.159
+339,C3,RSA,Timeout,3.0,0.0
+340,C4,FedX,CostFed with the same query optimizer as others,3.0,0.0
+341,C4,FedX,Source Selection Time,3.0,0.13440000000000002
+342,C4,FedX,Execution Time,3.0,261.88960000000003
+343,C4,FedX,Timeout,3.0,0.0
+344,C4,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+345,C4,HiBiscuS,Source Selection Time,3.0,0.010199999999999999
+346,C4,HiBiscuS,Execution Time,3.0,175.1318
+347,C4,HiBiscuS,Timeout,3.0,0.0
+348,C4,CostFed,CostFed with the same query optimizer as others,3.0,165.1856
+349,C4,CostFed,Source Selection Time,3.0,0.0038
+350,C4,CostFed,Execution Time,3.0,0.8146000000000001
+351,C4,CostFed,Timeout,3.0,0.0
+352,C4,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+353,C4,FedUP,Source Selection Time,3.0,0.027000000000000003
+354,C4,FedUP,Execution Time,3.0,0.2912
+355,C4,FedUP,Timeout,3.0,0.0
+356,C4,RSA,CostFed with the same query optimizer as others,3.0,0.0
+357,C4,RSA,Source Selection Time,3.0,0.0
+358,C4,RSA,Execution Time,3.0,0.8076000000000001
+359,C4,RSA,Timeout,3.0,0.0
+360,C5,FedX,CostFed with the same query optimizer as others,3.0,0.0
+361,C5,FedX,Source Selection Time,3.0,0.0
+362,C5,FedX,Execution Time,3.0,0.0
+363,C5,FedX,Timeout,3.0,1200.0
+364,C5,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+365,C5,HiBiscuS,Source Selection Time,3.0,0.0
+366,C5,HiBiscuS,Execution Time,3.0,0.0
+367,C5,HiBiscuS,Timeout,3.0,1200.0
+368,C5,CostFed,CostFed with the same query optimizer as others,3.0,0.0
+369,C5,CostFed,Source Selection Time,3.0,0.0
+370,C5,CostFed,Execution Time,3.0,0.0
+371,C5,CostFed,Timeout,3.0,1200.0
+372,C5,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+373,C5,FedUP,Source Selection Time,3.0,0.0
+374,C5,FedUP,Execution Time,3.0,0.0
+375,C5,FedUP,Timeout,3.0,1200.0
+376,C5,RSA,CostFed with the same query optimizer as others,3.0,0.0
+377,C5,RSA,Source Selection Time,3.0,0.0
+378,C5,RSA,Execution Time,3.0,474.46819999999997
+379,C5,RSA,Timeout,3.0,0.0
+380,C6,FedX,CostFed with the same query optimizer as others,3.0,0.0
+381,C6,FedX,Source Selection Time,3.0,0.088
+382,C6,FedX,Execution Time,3.0,10.4002
+383,C6,FedX,Timeout,3.0,0.0
+384,C6,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+385,C6,HiBiscuS,Source Selection Time,3.0,0.01
+386,C6,HiBiscuS,Execution Time,3.0,9.089
+387,C6,HiBiscuS,Timeout,3.0,0.0
+388,C6,CostFed,CostFed with the same query optimizer as others,3.0,7.2262
+389,C6,CostFed,Source Selection Time,3.0,0.0016
+390,C6,CostFed,Execution Time,3.0,1.9116
+391,C6,CostFed,Timeout,3.0,0.0
+392,C6,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+393,C6,FedUP,Source Selection Time,3.0,0.0006000000000000001
+394,C6,FedUP,Execution Time,3.0,8.6682
+395,C6,FedUP,Timeout,3.0,0.0
+396,C6,RSA,CostFed with the same query optimizer as others,3.0,0.0
+397,C6,RSA,Source Selection Time,3.0,0.0
+398,C6,RSA,Execution Time,3.0,26.2468
+399,C6,RSA,Timeout,3.0,0.0
+400,C7,FedX,CostFed with the same query optimizer as others,3.0,0.0
+401,C7,FedX,Source Selection Time,3.0,0.047
+402,C7,FedX,Execution Time,3.0,0.42300000000000004
+403,C7,FedX,Timeout,3.0,0.0
+404,C7,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+405,C7,HiBiscuS,Source Selection Time,3.0,0.0072
+406,C7,HiBiscuS,Execution Time,3.0,0.1292
+407,C7,HiBiscuS,Timeout,3.0,0.0
+408,C7,CostFed,CostFed with the same query optimizer as others,3.0,-0.0234
+409,C7,CostFed,Source Selection Time,3.0,0.0128
+410,C7,CostFed,Execution Time,3.0,0.1484
+411,C7,CostFed,Timeout,3.0,0.0
+412,C7,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+413,C7,FedUP,Source Selection Time,3.0,0.001
+414,C7,FedUP,Execution Time,3.0,0.1348
+415,C7,FedUP,Timeout,3.0,0.0
+416,C7,RSA,CostFed with the same query optimizer as others,3.0,0.0
+417,C7,RSA,Source Selection Time,3.0,0.0
+418,C7,RSA,Execution Time,3.0,0.6843999999999999
+419,C7,RSA,Timeout,3.0,0.0
+420,C8,FedX,CostFed with the same query optimizer as others,3.0,0.0
+421,C8,FedX,Source Selection Time,3.0,0.1046
+422,C8,FedX,Execution Time,3.0,15.156200000000002
+423,C8,FedX,Timeout,3.0,0.0
+424,C8,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+425,C8,HiBiscuS,Source Selection Time,3.0,0.007200000000000001
+426,C8,HiBiscuS,Execution Time,3.0,14.911000000000001
+427,C8,HiBiscuS,Timeout,3.0,0.0
+428,C8,CostFed,CostFed with the same query optimizer as others,3.0,-0.008000000000000002
+429,C8,CostFed,Source Selection Time,3.0,0.0128
+430,C8,CostFed,Execution Time,3.0,14.825
+431,C8,CostFed,Timeout,3.0,0.0
+432,C8,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+433,C8,FedUP,Source Selection Time,3.0,0.005
+434,C8,FedUP,Execution Time,3.0,15.01
+435,C8,FedUP,Timeout,3.0,0.0
+436,C8,RSA,CostFed with the same query optimizer as others,3.0,0.0
+437,C8,RSA,Source Selection Time,3.0,0.0
+438,C8,RSA,Execution Time,3.0,2.0852
+439,C8,RSA,Timeout,3.0,0.0
+440,C9,FedX,CostFed with the same query optimizer as others,3.0,0.0
+441,C9,FedX,Source Selection Time,3.0,0.06860000000000001
+442,C9,FedX,Execution Time,3.0,12.110800000000001
+443,C9,FedX,Timeout,3.0,0.0
+444,C9,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+445,C9,HiBiscuS,Source Selection Time,3.0,0.0062
+446,C9,HiBiscuS,Execution Time,3.0,12.3136
+447,C9,HiBiscuS,Timeout,3.0,0.0
+448,C9,CostFed,CostFed with the same query optimizer as others,3.0,0.5614000000000001
+449,C9,CostFed,Source Selection Time,3.0,0.004
+450,C9,CostFed,Execution Time,3.0,12.3084
+451,C9,CostFed,Timeout,3.0,0.0
+452,C9,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+453,C9,FedUP,Source Selection Time,3.0,0.0021999999999999997
+454,C9,FedUP,Execution Time,3.0,11.4782
+455,C9,FedUP,Timeout,3.0,0.0
+456,C9,RSA,CostFed with the same query optimizer as others,3.0,0.0
+457,C9,RSA,Source Selection Time,3.0,0.0
+458,C9,RSA,Execution Time,3.0,17.558
+459,C9,RSA,Timeout,3.0,0.0
+460,C10,FedX,CostFed with the same query optimizer as others,3.0,0.0
+461,C10,FedX,Source Selection Time,3.0,0.0634
+462,C10,FedX,Execution Time,3.0,0.5988
+463,C10,FedX,Timeout,3.0,0.0
+464,C10,HiBiscuS,CostFed with the same query optimizer as others,3.0,0.0
+465,C10,HiBiscuS,Source Selection Time,3.0,0.0054
+466,C10,HiBiscuS,Execution Time,3.0,0.5612
+467,C10,HiBiscuS,Timeout,3.0,0.0
+468,C10,CostFed,CostFed with the same query optimizer as others,3.0,0.4056
+469,C10,CostFed,Source Selection Time,3.0,0.001
+470,C10,CostFed,Execution Time,3.0,0.1392
+471,C10,CostFed,Timeout,3.0,0.0
+472,C10,FedUP,CostFed with the same query optimizer as others,3.0,0.0
+473,C10,FedUP,Source Selection Time,3.0,0.001
+474,C10,FedUP,Execution Time,3.0,2.1374
+475,C10,FedUP,Timeout,3.0,0.0
+476,C10,RSA,CostFed with the same query optimizer as others,3.0,0.0
+477,C10,RSA,Source Selection Time,3.0,0.0
+478,C10,RSA,Execution Time,3.0,5.6368
+479,C10,RSA,Timeout,3.0,0.0
