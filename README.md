@@ -336,7 +336,9 @@ scale for source selection times goes down to 0.0001.
 - Figure 3: Data Transfer (MB) when the federation grows
 ![image](results/data_transfer.png)
 
-- Figure 4: Number of ASK when the federation grows
+- Figure 4: FedUp performance (all metrics) when the federation grows, compared to SoTA engines.
+It's worth noting that any metric column should be interpreted within the context of "status_timeout" and "status_error".
+For example, for CostFed the data transfer appears to "diminish" as federation size grows because the timeout rate increases.
 ![image](results/fedup_fedshop_extra.png)
 
 
