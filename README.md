@@ -337,7 +337,7 @@ scale for source selection times goes down to 0.0001.
 ![image](results/data_transfer.png)
 
 - Figure 4: Number of ASK when the federation grows
-![image](results/ask.png)
+![image](results/fedup_fedshop_extra.png)
 
 
 
