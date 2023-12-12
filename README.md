@@ -306,8 +306,14 @@ Experimental results and plot scripts are available in the [results](https://git
 ### Source selection times
 
 Source selection times of LargeRDFBench and FedShop queries on a
-logarithmic scale.  *Careful*: the scale of execution times goes down to
-0.001 while this scale for source selection times goes down to 0.0001.
+logarithmic scale. Execution times and source selection times cannot
+coexist on the same stacked bar chart as the logarithmic scale
+misleads the reader to think that either source selection times do not
+exist (when they are on top), or they are very important (when they
+are at the bottom).
+
+*Careful*: The scale of execution times goes down to 0.001 while this
+scale for source selection times goes down to 0.0001.
 
 ![image](results/largerdfbench_source_selection_time.png)
 
