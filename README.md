@@ -303,6 +303,19 @@ Experimental results and plot scripts are available in the [results](https://git
 
 ## Supplement materials
 
+### Source selection times
+
+Source selection times of LargeRDFBench and FedShop queries on a
+logarithmic scale.  *Careful*: the scale of execution times goes down to
+0.001 while this scale for source selection times goes down to 0.0001.
+
+![image](results/largerdfbench_source_selection_time.png)
+
+![image](results/fedshop_source_selection_time_batch_0_9.png)
+
+
+
+
 ### FedShop: FedUP vs RSA
 - Figure 1: Engines execution time (ms) when the federation grows.
 ![image](results/exec_time.png)
