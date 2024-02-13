@@ -11,6 +11,10 @@ such a shift on two benchmarks:
 - [X] The new FedShop benchmark [3] that emulates an e-commerce
       application that scales up to 200 endpoints.
 
+_A better version of FedUP has been developped since then, and it's
+available at its [dedicated
+repository](https://github.com/GDD-Nantes/fedup)._
+
 ## Installation
 
 > **Note**
