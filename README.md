@@ -19,8 +19,6 @@ such a shift on two benchmarks:
 > **Dependencies**
 > conda, maven, java 11 & 20 (JDK)
 
-### QuickStart
-
 ```bash
 git clone git@github.com:GDD-Nantes/FedUP-experiments.git
 cd FedUP-experiments
@@ -41,13 +39,16 @@ directory. Detailed interpretations are available in the article.
 
 ![Total execution time on FedShop.](results/total_fedshop_20_200.png)
 
-## Supplementary materials
 
-All measurements for
+## Supplementary Materials
+
+Due to space limitations, these experimental results do not appear in
+the scientific paper.  All measurements for
 [LargeRDFBench](results/results_largerdfbench.csv) and [FedShop on
-batches 0 and 9](results/results_fedshop.csv) are available.
+batches 0 and 9](results/results_fedshop.csv) are available in the
+form of `.csv` files.
 
-### Source selection times
+### Source Selection Times
 
 Source selection times of LargeRDFBench and FedShop queries on a
 logarithmic scale. Execution times and source selection times cannot
@@ -63,19 +64,25 @@ are at the bottom).
 
 ![image](results/fedshop_source_selection_time_batch_0_9.png)
 
-### FedShop: FedUP vs RSA
-- Figure 1: Engines execution time (ms) when the federation grows.
+### Total Execution Times on all FedShop's Configurations
+
 ![image](results/exec_time.png)
 
-- Figure 2: Source selection time (ms) when the federation grows (RSA has no source-selection time as the source selection is pre-computed)
+### Source Selection Times on all FedShop's Configurations
+
 ![image](results/source_selection_time.png)
 
-- Figure 3: Data Transfer (MB) when the federation grows
+### Data Transfer on all FedShop's Configurations
+
 ![image](results/data_transfer.png)
 
-- Figure 4: FedUP performance (all metrics) when the federation grows, compared to SoTA engines.
-It's worth noting that any metric column should be interpreted within the context of "status_timeout" and "status_error".
-For example, for CostFed the data transfer appears to "diminish" as federation size grows because the timeout rate increases.
+### FedUP vs State-of-the-art on all FedShop's Configurations 
+
+> **Careful** Any metric column should be interpreted within the
+> context of "status_timeout" and "status_error".  For example, for
+> CostFed the data transfer appears to "diminish" as federation size
+> grows because the timeout rate increases.
+
 ![image](results/fedup_fedshop_extra.png)
 
 
